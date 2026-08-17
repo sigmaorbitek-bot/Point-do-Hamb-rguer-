@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta
+      name="description"
+      content="Painel administrativo do Point do Hambúrguer."
+    />
+
+    <meta name="theme-color" content="#ff4500" />
+
+    <title>Painel Admin | Point do Hambúrguer</title>
+
+    <link rel="icon" type="image/png" href="../../assets/point.png" />
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <!-- ==================================================
+         CABEÇALHO
+         ================================================== -->
+
+    <nav class="admin-navbar">
+      <div class="admin-logo">
+        <img src="../../assets/point.png" alt="Logo do Point do Hambúrguer" />
+
+        <div class="admin-logo-text">
+          <h1>Point <span>🍔</span> Hambúrguer</h1>
+
+          <p>Painel administrativo</p>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ==================================================
+         CONTEÚDO PRINCIPAL
+         ================================================== -->
+
+    <main class="admin-main">
+      <!-- ==================================================
+           CABEÇALHO DO PAINEL
+           ================================================== -->
+
+      <header class="admin-header">
+        <span class="admin-tag"> ⚙️ Administração </span>
+
+        <h2>Painel de controle</h2>
+
+        <p>Gerencie cardápio, pedidos, funcionamento e vendas da loja.</p>
+      </header>
+
+      <!-- ==================================================
+           RESUMO
+           ================================================== -->
+
+      <section class="resumo-admin" aria-label="Resumo da loja">
+        <!-- PRODUTOS -->
+
+        <article class="resumo-card">
+          <span class="resumo-icon" aria-hidden="true"> 📦 </span>
+
+          <div class="resumo-info">
+            <small> Produtos </small>
+
+            <strong id="total-produtos"> 0 </strong>
+          </div>
+        </article>
+
+        <!-- PEDIDOS -->
+
+        <article class="resumo-card">
+          <span class="resumo-icon" aria-hidden="true"> 🛒 </span>
+
+          <div class="resumo-info">
+            <small> Pedidos </small>
+
+            <strong id="total-pedidos"> 0 </strong>
+          </div>
+        </article>
+
+        <!-- VENDAS -->
+
+        <article class="resumo-card">
+          <span class="resumo-icon" aria-hidden="true"> 💰 </span>
+
+          <div class="resumo-info">
+            <small> Vendas </small>
+
+            <strong id="total-vendas"> R$ 0,00 </strong>
+          </div>
+        </article>
+
+        <!-- TICKET MÉDIO -->
+
+        <article class="resumo-card">
+          <span class="resumo-icon" aria-hidden="true"> 📈 </span>
+
+          <div class="resumo-info">
+            <small> Ticket médio </small>
+
+            <strong id="ticket-medio"> R$ 0,00 </strong>
+          </div>
+        </article>
+      </section>
+
+      <!-- ==================================================
+           PRODUTOS
+           ================================================== -->
+
+      <section id="secao-produtos" class="admin-section">
+        <div class="section-titulo">
+          <span aria-hidden="true"> 📦 </span>
+
+          <div>
+            <h2>Cadastrar Produtos</h2>
+
+            <p>Adicione um novo produto ao cardápio.</p>
+          </div>
+        </div>
+
+        <!-- FORMULÁRIO -->
+
+        <form id="form-produto" class="formulario">
+          <!-- NOME -->
+
+          <div class="campo">
+            <label for="nome"> Nome do produto </label>
+
+            <input
+              type="text"
+              id="nome"
+              name="nome"
+              placeholder="Ex.: X-Bacon"
+              maxlength="100"
+              required
+            />
+          </div>
+
+          <!-- PREÇO -->
+
+          <div class="campo">
+            <label for="preco"> Preço </label>
+
+            <input
+              type="number"
+              id="preco"
+              name="preco"
+              placeholder="Ex.: 14.00"
+              step="0.01"
+              min="0"
+              required
+            />
+          </div>
+
+          <!-- CATEGORIA -->
+
+          <div class="campo">
+            <label for="categoria"> Categoria </label>
+
+            <select id="categoria" name="categoria" required>
+              <option value="">Selecione</option>
+
+              <option value="hamburgueres">🍔 Hambúrgueres</option>
+
+              <option value="pastel">🥟 Pastéis</option>
+
+              <option value="cachorro-quente">🌭 Cachorro-quente</option>
+
+              <option value="porcoes">🍟 Porções</option>
+
+              <option value="bebidas">🥤 Bebidas</option>
+
+              <option value="sucos">🧃 Sucos</option>
+
+              <option value="aguas">💧 Águas</option>
+
+              <option value="combos">⭐ Combos</option>
+
+              <option value="sobremesas">🍨 Sobremesas</option>
+            </select>
+          </div>
+
+          <!-- ESTOQUE -->
+
+          <div class="campo">
+            <label for="estoque"> Estoque </label>
+
+            <input
+              type="number"
+              id="estoque"
+              name="estoque"
+              placeholder="Ex.: 20"
+              min="0"
+              required
+            />
+          </div>
+
+          <!-- DESCRIÇÃO -->
+
+          <div class="campo campo-largo">
+            <label for="descricao"> Descrição </label>
+
+            <textarea
+              id="descricao"
+              name="descricao"
+              placeholder="Descreva o produto"
+              maxlength="500"
+              rows="4"
+            ></textarea>
+          </div>
+
+          <!-- FOTO -->
+
+          <div class="campo campo-largo">
+            <label for="foto"> 📷 Foto do produto </label>
+
+            <input
+              type="file"
+              id="foto"
+              name="foto"
+              accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+            />
+
+            <small class="ajuda-campo"> JPG, PNG ou WEBP • máximo 5 MB </small>
+          </div>
+
+          <!-- BOTÃO -->
+
+          <div class="campo campo-largo">
+            <button type="submit" class="btn-principal">
+              + Cadastrar Produto
+            </button>
+          </div>
+
+          <!-- MENSAGEM -->
+
+          <p
+            id="msg-cadastro"
+            class="mensagem"
+            role="status"
+            aria-live="polite"
+          ></p>
+        </form>
+      </section>
+
+      <!-- ==================================================
+           PRODUTOS CADASTRADOS
+           ================================================== -->
+
+      <section id="secao-lista-produtos" class="admin-section">
+        <div class="section-titulo">
+          <span aria-hidden="true"> 🛍️ </span>
+
+          <div>
+            <h2>Produtos Cadastrados</h2>
+
+            <p>Gerencie os itens disponíveis no cardápio.</p>
+          </div>
+        </div>
+
+        <!-- BUSCA -->
+
+        <div class="admin-busca">
+          <input
+            type="search"
+            id="buscar-admin"
+            placeholder="Buscar produto..."
+            aria-label="Buscar produto"
+          />
+        </div>
+
+        <!-- LISTA -->
+
+        <div id="lista-admin" class="lista-admin">
+          <p class="estado-admin">Carregando produtos...</p>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           QUIOSQUE
+           ================================================== -->
+
+      <section id="secao-quiosque" class="admin-section">
+        <div class="section-titulo">
+          <span aria-hidden="true"> 🛖 </span>
+
+          <div>
+            <h2>Configuração do Quiosque</h2>
+
+            <p>Configure as mesas disponíveis para atendimento.</p>
+          </div>
+        </div>
+
+        <form id="form-quiosque" class="formulario">
+          <div class="campo">
+            <label for="quantidade-mesas"> Quantidade de mesas </label>
+
+            <input
+              type="number"
+              id="quantidade-mesas"
+              name="quantidade-mesas"
+              min="1"
+              max="100"
+              placeholder="Ex.: 8"
+              required
+            />
+          </div>
+
+          <div class="campo campo-largo">
+            <button type="submit" class="btn-principal">
+              Salvar configuração
+            </button>
+          </div>
+
+          <p
+            id="msg-quiosque"
+            class="mensagem"
+            role="status"
+            aria-live="polite"
+          ></p>
+        </form>
+      </section>
+
+      <!-- ==================================================
+           DELIVERY
+           ================================================== -->
+
+      <section id="secao-delivery" class="admin-section">
+        <div class="section-titulo">
+          <span aria-hidden="true"> 🛵 </span>
+
+          <div>
+            <h2>Configuração do Delivery</h2>
+
+            <p>Configure as informações de entrega.</p>
+          </div>
+        </div>
+
+        <form id="form-delivery" class="formulario">
+          <!-- TAXA -->
+
+          <div class="campo">
+            <label for="taxa"> Taxa de entrega </label>
+
+            <input
+              type="number"
+              id="taxa"
+              name="taxa"
+              placeholder="Ex.: 5.00"
+              step="0.01"
+              min="0"
+              required
+            />
+          </div>
+
+          <!-- TEMPO -->
+
+          <div class="campo">
+            <label for="tempo"> Tempo estimado </label>
+
+            <input
+              type="text"
+              id="tempo"
+              name="tempo"
+              placeholder="Ex.: 30 - 50 minutos"
+              maxlength="50"
+              required
+            />
+          </div>
+
+          <!-- BOTÃO -->
+
+          <div class="campo campo-largo">
+            <button type="submit" class="btn-principal">
+              Salvar configuração
+            </button>
+          </div>
+
+          <p
+            id="msg-delivery"
+            class="mensagem"
+            role="status"
+            aria-live="polite"
+          ></p>
+        </form>
+      </section>
+
+      <!-- ==================================================
+           PEDIDOS
+           ================================================== -->
+
+      <section id="secao-pedidos" class="admin-section">
+        <div class="section-titulo">
+          <span aria-hidden="true"> 🛒 </span>
+
+          <div>
+            <h2>Pedidos Recebidos</h2>
+
+            <p>Acompanhe os pedidos feitos pelos clientes.</p>
+          </div>
+        </div>
+
+        <!-- FILTROS -->
+
+        <div class="filtros-pedidos">
+          <select
+            id="filtro-status-pedido"
+            aria-label="Filtrar pedidos por status"
+          >
+            <option value="todos">Todos os pedidos</option>
+
+            <option value="pendente">Pendentes</option>
+
+            <option value="preparo">Em preparo</option>
+
+            <option value="pronto">Prontos</option>
+
+            <option value="entregue">Entregues</option>
+
+            <option value="cancelado">Cancelados</option>
+          </select>
+        </div>
+
+        <!-- LISTA -->
+
+        <div id="lista-pedidos" class="lista-pedidos">
+          <p class="estado-admin">Nenhum pedido carregado.</p>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           FUNCIONAMENTO DA LOJA
+           ================================================== -->
+
+      <section id="secao-horarios" class="admin-section">
+        <div class="section-titulo">
+          <span aria-hidden="true"> 🕒 </span>
+
+          <div>
+            <h2>Funcionamento da Loja</h2>
+
+            <p>Configure os dias e horários de atendimento.</p>
+          </div>
+        </div>
+
+        <!-- MODO DA LOJA -->
+
+        <div class="controle-loja">
+          <div>
+            <strong> Modo da loja </strong>
+
+            <p id="texto-status-manual">Automático pelo horário</p>
+          </div>
+
+          <select id="modo-loja" aria-label="Modo de funcionamento da loja">
+            <option value="automatico">🕒 Automático</option>
+
+            <option value="aberta">🟢 Aberta manualmente</option>
+
+            <option value="fechada">🔴 Fechada manualmente</option>
+          </select>
+        </div>
+
+        <!-- HORÁRIOS -->
+
+        <div id="lista-horarios" class="lista-horarios">
+          <!--
+            Os horários serão carregados
+            pelo painel.js.
+          -->
+        </div>
+
+        <!-- SALVAR -->
+
+        <button id="btn-salvar-horarios" type="button" class="btn-principal">
+          Salvar horários
+        </button>
+
+        <p
+          id="msg-horarios"
+          class="mensagem"
+          role="status"
+          aria-live="polite"
+        ></p>
+      </section>
+      <!-- ==================================================
+     RELATÓRIOS
+     ================================================== -->
+
+      <section id="secao-relatorios" class="admin-section">
+        <div class="section-titulo">
+          <span aria-hidden="true">📊</span>
+
+          <div>
+            <h2>Relatórios</h2>
+
+            <p>Acompanhe as vendas e o desempenho da loja.</p>
+          </div>
+        </div>
+
+        <!-- FILTROS -->
+
+        <div class="relatorio-filtros">
+          <div class="relatorio-filtro">
+            <label for="relatorio-periodo"> Período </label>
+
+            <select id="relatorio-periodo">
+              <option value="hoje">Hoje</option>
+
+              <option value="7dias">Últimos 7 dias</option>
+
+              <option value="30dias">Últimos 30 dias</option>
+
+              <option value="mes">Este mês</option>
+            </select>
+          </div>
+
+          <button type="button" id="btn-gerar-relatorio" class="btn-relatorio">
+            📊 Gerar relatório
+          </button>
+        </div>
+
+        <!-- RESUMO -->
+
+        <div class="relatorio-resumo">
+          <article class="relatorio-card">
+            <span class="relatorio-icone"> 💰 </span>
+
+            <small> Total vendido </small>
+
+            <strong id="relatorio-total-vendas"> R$ 0,00 </strong>
+          </article>
+
+          <article class="relatorio-card">
+            <span class="relatorio-icone"> 🛒 </span>
+
+            <small> Pedidos </small>
+
+            <strong id="relatorio-total-pedidos"> 0 </strong>
+          </article>
+
+          <article class="relatorio-card">
+            <span class="relatorio-icone"> 📈 </span>
+
+            <small> Ticket médio </small>
+
+            <strong id="relatorio-ticket-medio"> R$ 0,00 </strong>
+          </article>
+
+          <article class="relatorio-card">
+            <span class="relatorio-icone"> 🍔 </span>
+
+            <small> Produtos vendidos </small>
+
+            <strong id="relatorio-produtos-vendidos"> 0 </strong>
+          </article>
+        </div>
+
+        <!-- TABELA -->
+
+        <div class="relatorio-tabela-container">
+          <table class="relatorio-tabela">
+            <thead>
+              <tr>
+                <th>Data</th>
+
+                <th>Pedidos</th>
+
+                <th>Produtos</th>
+
+                <th>Vendas</th>
+
+                <th>Ticket médio</th>
+              </tr>
+            </thead>
+
+            <tbody id="tabela-relatorio">
+              <tr>
+                <td colspan="5">Nenhum relatório carregado.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- AÇÕES -->
+
+        <div class="relatorio-acoes">
+          <button
+            type="button"
+            class="btn-relatorio"
+            id="btn-imprimir-relatorio"
+          >
+            🖨️ Imprimir
+          </button>
+
+          <button
+            type="button"
+            class="btn-relatorio btn-relatorio-secundario"
+            id="btn-atualizar-relatorio"
+          >
+            🔄 Atualizar
+          </button>
+        </div>
+      </section>
+
+      <!-- ==================================================
+           SAIR
+           ================================================== -->
+
+      <section class="admin-sair">
+        <button type="button" onclick="sair()">🚪 Sair do painel</button>
+      </section>
+    </main>
+
+    <!-- ==================================================
+         JAVASCRIPT
+         ================================================== -->
+
+    <script src="painel.js"></script>
+  </body>
+</html>

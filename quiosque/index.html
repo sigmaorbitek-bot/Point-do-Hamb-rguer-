@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="p-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Point do Hambúrguer - Lanches artesanais em Altinho-PE." />
+  <meta name="theme-color" content="#ff4500" />
+  <title>Quiosque | Point do Hambúrguer</title>
+  <link rel="icon" type="image/png" href="../assets/point.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <!-- ==================================================
+         CABEÇALHO
+         ================================================== -->
+
+  <nav class="navbar">
+    <div class="navbar-logo">
+      <img src="../assets/point.png" alt="Logo da point" class="icon" />
+
+      <div class="navbar-nome">
+        <h1>🛖 Quiosque</h1>
+
+        <p>faça seu pedido diretamente aqui</p>
+      </div>
+    </div>
+  </nav>
+
+  <section class="cardapio" id="cardapio">
+    <h2>Cardápio Digital</h2>
+
+    <!-- ==================================================
+       BARRA DE PESQUISA
+       ================================================== -->
+    <div class="busca">
+      <input type="text" id="busca-input" placeholder="🔍 Buscar lanche..." autocomplete="off" />
+    </div>
+
+    <div class="filtros">
+      <button class="filtro-btn ativo" data-categoria="todos">Todos</button>
+      <button class="filtro-btn" data-categoria="lanches">Lanches</button>
+      <button class="filtro-btn" data-categoria="bebidas">Bebidas</button>
+      <button class="filtro-btn" data-categoria="sobremesas">Sobremesas</button>
+    </div>
+
+    <div class="lista-itens" id="lista-itens">
+      <!-- Os itens serão inseridos aqui via JavaScript (Supabase) -->
+    </div>
+  </section>
+
+  <!-- ==================================================
+       CARRINHO (fixo lateral/inferior)
+       ================================================== -->
+  <aside class="carrinho" id="carrinho">
+    <h2>Seu Pedido</h2>
+
+    <div class="carrinho-itens" id="carrinho-itens">
+      <p class="carrinho-vazio">Seu carrinho está vazio</p>
+    </div>
+
+    <div class="carrinho-total">
+      <span>Total:</span>
+      <strong id="carrinho-total-valor">R$ 0,00</strong>
+    </div>
+
+    <button id="btn-finalizar" class="btn-finalizar">
+      Finalizar Pedido
+    </button>
+  </aside>
+
+  <!-- ==================================================
+       MODAL - DADOS DO CLIENTE / ENDEREÇO
+       ================================================== -->
+  <div class="modal" id="modal-pedido">
+    <div class="modal-conteudo">
+      <button class="modal-fechar" id="modal-fechar">&times;</button>
+
+      <h2>Finalizar Pedido</h2>
+
+      <form id="form-pedido">
+
+        <label for="nome">Nome completo</label>
+        <input type="text" id="nome" name="nome" required />
+
+        <label for="telefone">WhatsApp</label>
+        <input type="tel" id="telefone" name="telefone" required placeholder="(81) 9xxxx-xxxx" />
+        <label for="qual-mesa">Mesa</label>
+        <select id="qual-mesa" name="qual-mesa" required>
+          <option value="">Selecione</option>
+          <option value="m01">01</option>
+          <option value="m02">02</option>
+          <option value="m03">03</option>
+        </select>
+
+        <label for="forma-pagamento">Forma de pagamento</label>
+        <select id="forma-pagamento" name="forma-pagamento" required>
+          <option value="">Selecione</option>
+          <option value="pix">Pix</option>
+          <option value="dinheiro">Dinheiro</option>
+          <option value="cartao">Cartão (na entrega)</option>
+        </select>
+
+        <label for="observacoes">Observações</label>
+        <textarea id="observacoes" name="observacoes" rows="2"></textarea>
+
+        <button type="submit" class="btn-finalizar">
+          Confirmar Pedido
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+  </main>
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- JavaScript da página -->
+  <script src="script.js"></script>
+</body>
+
+</html>

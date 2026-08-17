@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="description" content="Point do Hambúrguer - Área do Sistema." />
+    <meta name="theme-color" content="#ff4500" />
+    <title>Área do Sistema | Point do Hambúrguer</title>
+    <link rel="icon" type="image/png" href="../assets/point.png" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <main id="inicio">
+      <section class="container" aria-labelledby="titulo-loja">
+        <div class="box">
+          <!-- ==================================================
+                     LOGO
+                ================================================== -->
+          <div class="logo-container">
+            <img
+              src="../assets/point.png"
+              alt="Logo do Point do Hambúrguer"
+              class="bv-logo"
+            />
+          </div>
+
+          <!-- ==================================================
+                     TÍTULO
+                ================================================== -->
+
+          <h1 id="titulo-loja" class="bv-titulo">Área do Sistema</h1>
+
+          <!-- ==================================================
+                     DIVISOR
+                ================================================== -->
+
+          <div class="bv-divisor" aria-hidden="true"></div>
+
+          <!-- ==================================================
+                     FORMULÁRIO
+                ================================================== -->
+
+          <form id="form-login">
+            <!-- EMAIL -->
+
+            <div class="campo">
+              <label for="email"> E-mail </label>
+
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Digite seu e-mail"
+                autocomplete="email"
+                required
+              />
+            </div>
+
+            <!-- SENHA -->
+
+            <div class="campo">
+              <label for="senha"> Senha </label>
+
+              <input
+                type="password"
+                id="senha"
+                name="senha"
+                placeholder="Digite sua senha"
+                autocomplete="current-password"
+                required
+              />
+            </div>
+
+            <!-- BOTÃO ACESSAR -->
+
+            <button id="btn-entrar" type="submit" onclick="entrar()">🔐 Acessar</button>
+          </form>
+
+          <!-- ==================================================
+                     VOLTAR PARA LOJA
+                ================================================== -->
+
+          <button id="btn-voltar" type="button" onclick="voltar()">
+            ← Voltar para Loja
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

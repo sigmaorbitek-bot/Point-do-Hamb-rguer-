@@ -1,0 +1,211 @@
+/* ==========================================================================
+   1. RESET E CONFIGURAÇÕES BASE
+   ========================================================================== */
+
+:root {
+  /* Cores principais */
+
+  --cor-fundo: #121212;
+
+  --cor-card: #1e1e1e;
+
+  --cor-destaque: #ff4500;
+
+  --cor-destaque-hover: #ff5a1f;
+
+  /* Textos */
+
+  --cor-texto-principal: #ffffff;
+
+  --cor-texto-secundario: #b3b3b3;
+
+  --cor-texto-terciario: #888888;
+
+  /* Status / WhatsApp */
+
+  --cor-sucesso: #25d366;
+
+  /* Outros */
+
+  --cor-borda: rgba(255, 255, 255, 0.08);
+
+  --sombra-card: 0 15px 50px rgba(0, 0, 0, 0.45);
+}
+
+/* ==========================================================================
+   RESET UNIVERSAL
+   ========================================================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   HTML
+   ========================================================================== */
+
+html {
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
+/* ==========================================================================
+   BODY
+   ========================================================================== */
+
+body {
+  min-height: 100vh;
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto-principal);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+  animation: fadeInTela 0.8s ease;
+}
+
+
+/* ==========================================================================
+   1. RESET E CONFIGURAÇÕES BASE
+   ========================================================================== */
+
+:root {
+  /* Cores principais */
+
+  --cor-fundo: #121212;
+
+  --cor-card: #1e1e1e;
+
+  --cor-destaque: #ff4500;
+
+  --cor-destaque-hover: #ff5a1f;
+
+  /* Textos */
+
+  --cor-texto-principal: #ffffff;
+
+  --cor-texto-secundario: #b3b3b3;
+
+  --cor-texto-terciario: #888888;
+
+  /* Status / WhatsApp */
+
+  --cor-sucesso: #25d366;
+
+  /* Outros */
+
+  --cor-borda: rgba(255, 255, 255, 0.08);
+
+  --sombra-card: 0 15px 50px rgba(0, 0, 0, 0.45);
+}
+
+/* ==========================================================================
+   RESET UNIVERSAL
+   ========================================================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   HTML
+   ========================================================================== */
+
+html {
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
+/* ==========================================================================
+   BODY
+   ========================================================================== */
+
+body {
+  min-height: 100vh;
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto-principal);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+  animation: fadeInTela 0.8s ease;
+}
+
+
+
+/* ==========================================================================
+   2. TELA DE BOAS-VINDAS
+   ========================================================================== */
+
+#inicio {
+  width: 100%;
+}
+
+.container {
+  width: 100%;
+  min-height: 100vh;
+  padding: 40px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   CAIXA PRINCIPAL e EFEITO DE BRILHO
+   ========================================================================== */
+
+.box {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  padding: 50px 40px;
+  background: var(--cor-card);
+  border: 1px solid var(--cor-borda);
+  border-top: 5px solid var(--cor-destaque);
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: var(--sombra-card);
+  overflow: hidden;
+  animation: subirCaixa 0.8s ease;
+}
+
+/* EFEITO DE BRILHO */
+
+.box::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 69, 0, 0.04),
+    transparent
+  );
+  animation: brilho 5s linear infinite;
+  pointer-events: none;
+}
+
+
+/* ==========================================================================
+   3. LOGO E TÍTULOS
+   ========================================================================== */
+
+/* LOGO */
+
+.logo-container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.bv-logo {
+  display: block;
+  width: 120px;
+  max-width: 40vw;
+  margin: 0 auto 20px;
+  animation: pulsarLogo 2.5s ease-in-out infinite;
+}
