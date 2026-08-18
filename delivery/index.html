@@ -12,138 +12,391 @@
 
   <title>Delivery | Point do Hambúrguer</title>
 
-  <link rel="icon" type="image/png" href="../assets/point.png" />
+  <link rel="icon" type="image/png" href="../assets/favicon.svg" />
 
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-  <main id="inicio">
-    <section class="container" aria-labelledby="titulo-loja">
-      <div class="box">
-        <!-- ==================================================
-                     LOGO
-                ================================================== -->
-        <div class="logo-container">
-          <img src="../assets/point.png" alt="Logo do Point do Hambúrguer" class="bv-logo" />
-        </div>
-        <!-- ==================================================
-                     TÍTULO
-                ================================================== -->
-        <h1 id="titulo-loja" class="bv-titulo">
-          🛵 Delivery | Cardápio Digital
-        </h1>
-        <!-- SUBTÍTULO -->
-        <p class="bv-subtitulo">Faça seu pedido diretamente aqui</p>
-        <!-- ==================================================
-                     DIVISOR
-          ================================================== -->
-
-        <div class="bv-divisor" aria-hidden="true"></div>
-
-        <!-- ==================================================
-       CARDÁPIO
-       ================================================== -->
-        <div class="container" id="cardapio">
-          <!-- ==================================================
-       BARRA DE PESQUISA
-       ================================================== -->
-          <div class="busca">
-            <input type="text" id="busca-input" placeholder="🔍 Buscar lanche..." autocomplete="off" />
-          </div>
-
-          <div class="filtros">
-            <button class="filtro-btn ativo" data-categoria="todos">
-              Todos
-            </button>
-            <button class="filtro-btn" data-categoria="lanches">
-              Lanches
-            </button>
-            <button class="filtro-btn" data-categoria="bebidas">
-              Bebidas
-            </button>
-            <button class="filtro-btn" data-categoria="sobremesas">
-              Sobremesas
-            </button>
-          </div>
-
-          <div class="lista-itens" id="lista-itens">
-            <!-- Os itens serão inseridos aqui via JavaScript (Supabase) -->
-          </div>
-        </div>
-
-        <!-- ==================================================
-       CARRINHO (fixo lateral/inferior)
-       ================================================== -->
-        <aside class="carrinho" id="carrinho">
-          <h2>Seu Pedido</h2>
-
-          <div class="carrinho-itens" id="carrinho-itens">
-            <p class="carrinho-vazio">Seu carrinho está vazio</p>
-          </div>
-
-          <div class="carrinho-total">
-            <span>Total:</span>
-            <strong id="carrinho-total-valor">R$ 0,00</strong>
-          </div>
-
-          <button id="btn-finalizar" class="btn-finalizar">
-            Finalizar Pedido
-          </button>
-        </aside>
-
-        <!-- ==================================================
-       MODAL - DADOS DO CLIENTE / ENDEREÇO
-       ================================================== -->
-        <div class="modal" id="modal-pedido">
-          <div class="modal-conteudo">
-            <button class="modal-fechar" id="modal-fechar">&times;</button>
-
-            <h2>Finalizar Pedido</h2>
-
-            <form id="form-pedido">
-              <label for="nome">Nome completo</label>
-              <input type="text" id="nome" name="nome" required />
-
-              <label for="telefone">WhatsApp</label>
-              <input type="tel" id="telefone" name="telefone" required placeholder="(81) 9xxxx-xxxx" />
-
-              <label for="endereco">Endereço</label>
-              <input type="text" id="endereco" name="endereco" required placeholder="Rua, número, bairro" />
-
-              <label for="referencia">Ponto de referência</label>
-              <input type="text" id="referencia" name="referencia" />
-
-              <label for="forma-pagamento">Forma de pagamento</label>
-              <select id="forma-pagamento" name="forma-pagamento" required>
-                <option value="">Selecione</option>
-                <option value="pix">Pix</option>
-                <option value="dinheiro">Dinheiro</option>
-                <option value="cartao">Cartão (na entrega)</option>
-              </select>
-
-              <label for="observacoes">Observações</label>
-              <textarea id="observacoes" name="observacoes" rows="2"></textarea>
-
-              <button type="submit" class="btn-finalizar">
-                Confirmar Pedido
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
 
   <!-- ==================================================
-       SUPABASE (SDK via CDN — precisa vir ANTES do script.js)
+       CABEÇALHO
        ================================================== -->
+
+  <nav class="navbar">
+
+    <div class="navbar-logo">
+
+      <img src="../assets/point.png" alt="Logo do Point do Hambúrguer" class="icon" />
+
+      <div class="navbar-nome">
+
+        <h1>🛵 Delivery</h1>
+
+        <p>
+          Faça seu pedido diretamente aqui
+        </p>
+
+      </div>
+
+    </div>
+
+  </nav>
+
+
+  <!-- ==================================================
+       CARDÁPIO
+       ================================================== -->
+
+  <main class="cardapio">
+
+    <header class="cardapio-header">
+
+      <h2>
+        Cardápio Digital
+      </h2>
+
+      <p>
+        Escolha seus produtos e monte seu pedido.
+      </p>
+
+    </header>
+
+
+    <!-- ==================================================
+         BUSCA
+         ================================================== -->
+
+    <div class="busca">
+
+      <input type="search" id="busca-input" placeholder="🔍 Buscar lanche..." autocomplete="off" />
+
+    </div>
+
+
+    <!-- ==================================================
+         CATEGORIAS
+         ================================================== -->
+
+    <div class="filtros">
+
+      <button class="filtro-btn ativo" data-categoria="todos" type="button">
+        Todos
+      </button>
+
+      <button class="filtro-btn" data-categoria="lanches" type="button">
+        🍔 Lanches
+      </button>
+
+      <button class="filtro-btn" data-categoria="bebidas" type="button">
+        🥤 Bebidas
+      </button>
+
+      <button class="filtro-btn" data-categoria="sobremesas" type="button">
+        🍨 Sobremesas
+      </button>
+
+    </div>
+
+
+    <!-- ==================================================
+         PRODUTOS
+         ================================================== -->
+
+    <section class="lista-itens" id="lista-itens" aria-label="Produtos">
+
+      <p class="estado">
+        Carregando produtos...
+      </p>
+
+    </section>
+
+  </main>
+
+
+  <!-- ==================================================
+       CARRINHO
+       ================================================== -->
+
+  <aside class="carrinho" id="carrinho">
+
+    <div class="carrinho-header">
+
+      <h2>
+        🛒 Seu Pedido
+      </h2>
+
+    </div>
+
+
+    <div class="carrinho-itens" id="carrinho-itens">
+
+      <p class="carrinho-vazio">
+        Seu carrinho está vazio.
+      </p>
+
+    </div>
+
+
+    <!-- SUBTOTAL -->
+
+    <div class="carrinho-linha">
+
+      <span>
+        Subtotal
+      </span>
+
+      <strong id="carrinho-subtotal">
+        R$ 0,00
+      </strong>
+
+    </div>
+
+
+    <!-- TAXA -->
+
+    <div class="carrinho-linha">
+
+      <span>
+        Taxa de entrega
+      </span>
+
+      <strong id="taxa-entrega">
+        R$ 0,00
+      </strong>
+
+    </div>
+
+
+    <!-- TOTAL -->
+
+    <div class="carrinho-total">
+
+      <span>
+        Total
+      </span>
+
+      <strong id="carrinho-total-valor">
+        R$ 0,00
+      </strong>
+
+    </div>
+
+
+    <button id="btn-finalizar" class="btn-finalizar" type="button">
+      Finalizar Pedido
+    </button>
+
+  </aside>
+
+
+  <!-- ==================================================
+       MODAL PEDIDO
+       ================================================== -->
+
+  <div class="modal" id="modal-pedido">
+
+    <div class="modal-conteudo">
+
+      <button class="modal-fechar" id="modal-fechar" type="button" aria-label="Fechar">
+        &times;
+      </button>
+
+
+      <div class="modal-header">
+
+        <span>
+          🛵
+        </span>
+
+        <div>
+
+          <h2>
+            Finalizar Pedido
+          </h2>
+
+          <p>
+            Informe os dados para entrega.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- ==================================================
+           FORMULÁRIO
+           ================================================== -->
+
+      <form id="form-pedido">
+
+
+        <!-- NOME -->
+
+        <div class="campo">
+
+          <label for="nome">
+            Nome completo
+          </label>
+
+          <input type="text" id="nome" name="nome" placeholder="Digite seu nome" required />
+
+        </div>
+
+
+        <!-- WHATSAPP -->
+
+        <div class="campo">
+
+          <label for="telefone">
+            WhatsApp
+          </label>
+
+          <input type="tel" id="telefone" name="telefone" placeholder="(81) 9xxxx-xxxx" required />
+
+        </div>
+
+
+        <!-- ENDEREÇO -->
+
+        <div class="campo">
+
+          <label for="endereco">
+            Endereço
+          </label>
+
+          <input type="text" id="endereco" name="endereco" placeholder="Rua, número, bairro" required />
+
+        </div>
+
+
+        <!-- REFERÊNCIA -->
+
+        <div class="campo">
+
+          <label for="referencia">
+            Ponto de referência
+          </label>
+
+          <input type="text" id="referencia" name="referencia" placeholder="Ex.: próximo à praça" />
+
+        </div>
+
+
+        <!-- PAGAMENTO -->
+
+        <div class="campo">
+
+          <label for="forma-pagamento">
+            Forma de pagamento
+          </label>
+
+          <select id="forma-pagamento" name="forma-pagamento" required>
+
+            <option value="">
+              Selecione
+            </option>
+
+            <option value="pix">
+              Pix
+            </option>
+
+            <option value="dinheiro">
+              Dinheiro
+            </option>
+
+            <option value="cartao">
+              Cartão na entrega
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- OBSERVAÇÕES -->
+
+        <div class="campo">
+
+          <label for="observacoes">
+            Observações
+          </label>
+
+          <textarea id="observacoes" name="observacoes" rows="3"
+            placeholder="Alguma observação sobre o pedido?"></textarea>
+
+        </div>
+
+
+        <!-- RESUMO -->
+
+        <div class="resumo-pedido">
+
+          <div>
+
+            <span>
+              Produtos
+            </span>
+
+            <strong id="resumo-subtotal">
+              R$ 0,00
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              Entrega
+            </span>
+
+            <strong id="resumo-taxa">
+              R$ 0,00
+            </strong>
+
+          </div>
+
+
+          <div class="resumo-total">
+
+            <span>
+              Total
+            </span>
+
+            <strong id="resumo-total">
+              R$ 0,00
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <button type="submit" class="btn-finalizar">
+          Confirmar Pedido
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==================================================
+       SUPABASE
+       ================================================== -->
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 
   <!-- ==================================================
        JAVASCRIPT
        ================================================== -->
+
   <script src="script.js"></script>
+
 </body>
 
 </html>

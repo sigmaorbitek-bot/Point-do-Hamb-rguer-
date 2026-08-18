@@ -1,124 +1,352 @@
 <!doctype html>
-<html lang="p-BR">
+<html lang="pt-BR">
 
 <head>
   <meta charset="UTF-8" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <meta name="description" content="Point do Hambúrguer - Lanches artesanais em Altinho-PE." />
+
   <meta name="theme-color" content="#ff4500" />
+
   <title>Quiosque | Point do Hambúrguer</title>
-  <link rel="icon" type="image/png" href="../assets/point.png" />
+
+  <link rel="icon" type="image/png" href="../assets/favicon.svg" />
+
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
+
   <!-- ==================================================
-         CABEÇALHO
-         ================================================== -->
+       CABEÇALHO
+       ================================================== -->
 
   <nav class="navbar">
+
     <div class="navbar-logo">
-      <img src="../assets/point.png" alt="Logo da point" class="icon" />
+
+      <img src="../assets/point.png" alt="Logo do Point do Hambúrguer" class="icon" />
 
       <div class="navbar-nome">
+
         <h1>🛖 Quiosque</h1>
 
-        <p>faça seu pedido diretamente aqui</p>
+        <p>
+          Faça seu pedido diretamente aqui
+        </p>
+
       </div>
+
     </div>
+
   </nav>
 
-  <section class="cardapio" id="cardapio">
-    <h2>Cardápio Digital</h2>
+
+  <!-- ==================================================
+       CONTEÚDO PRINCIPAL
+       ================================================== -->
+
+  <main>
 
     <!-- ==================================================
-       BARRA DE PESQUISA
-       ================================================== -->
-    <div class="busca">
-      <input type="text" id="busca-input" placeholder="🔍 Buscar lanche..." autocomplete="off" />
-    </div>
+         CARDÁPIO
+         ================================================== -->
 
-    <div class="filtros">
-      <button class="filtro-btn ativo" data-categoria="todos">Todos</button>
-      <button class="filtro-btn" data-categoria="lanches">Lanches</button>
-      <button class="filtro-btn" data-categoria="bebidas">Bebidas</button>
-      <button class="filtro-btn" data-categoria="sobremesas">Sobremesas</button>
-    </div>
+    <section class="cardapio" id="cardapio">
 
-    <div class="lista-itens" id="lista-itens">
-      <!-- Os itens serão inseridos aqui via JavaScript (Supabase) -->
-    </div>
-  </section>
+      <h2>
+        Cardápio Digital
+      </h2>
+
+
+      <!-- ==================================================
+           BARRA DE PESQUISA
+           ================================================== -->
+
+      <div class="busca">
+
+        <input type="search" id="busca-input" placeholder="🔍 Buscar lanche..." autocomplete="off" />
+
+      </div>
+
+
+      <!-- ==================================================
+           FILTROS
+           ================================================== -->
+
+      <div class="filtros">
+
+        <button type="button" class="filtro-btn ativo" data-categoria="todos">
+          Todos
+        </button>
+
+        <button type="button" class="filtro-btn" data-categoria="hambúrgueres">
+          🍔 Hambúrgueres
+        </button>
+
+        <button type="button" class="filtro-btn" data-categoria="pastel">
+          🥟 Pastéis
+        </button>
+
+        <button type="button" class="filtro-btn" data-categoria="cachorro-quente">
+          🌭 Cachorro-quente
+        </button>
+
+        <button type="button" class="filtro-btn" data-categoria="porções">
+          🍟 Porções
+        </button>
+
+        <button type="button" class="filtro-btn" data-categoria="bebidas">
+          🥤 Bebidas
+        </button>
+
+        <button type="button" class="filtro-btn" data-categoria="sucos">
+          🧃 Sucos
+        </button>
+
+        <button type="button" class="filtro-btn" data-categoria="combos">
+          ⭐ Combos
+        </button>
+
+        <button type="button" class="filtro-btn" data-categoria="sobremesas">
+          🍨 Sobremesas
+        </button>
+
+      </div>
+
+
+      <!-- ==================================================
+           LISTA DE PRODUTOS
+           ================================================== -->
+
+      <div class="lista-itens" id="lista-itens">
+
+        <!--
+          Os produtos serão carregados
+          pelo JavaScript através do Supabase.
+        -->
+
+        <p class="estado-cardapio">
+          Carregando cardápio...
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- ==================================================
+         CARRINHO
+         ================================================== -->
+
+    <aside class="carrinho" id="carrinho">
+
+      <h2>
+        Seu Pedido
+      </h2>
+
+
+      <!-- ITENS DO CARRINHO -->
+
+      <div class="carrinho-itens" id="carrinho-itens">
+
+        <p class="carrinho-vazio">
+          Seu carrinho está vazio
+        </p>
+
+      </div>
+
+
+      <!-- TOTAL -->
+
+      <div class="carrinho-total">
+
+        <span>
+          Total:
+        </span>
+
+        <strong id="carrinho-total-valor">
+          R$ 0,00
+        </strong>
+
+      </div>
+
+
+      <!-- FINALIZAR -->
+
+      <button id="btn-finalizar" class="btn-finalizar" type="button" disabled>
+        Finalizar Pedido
+      </button>
+
+    </aside>
+
+  </main>
+
 
   <!-- ==================================================
-       CARRINHO (fixo lateral/inferior)
+       MODAL — FINALIZAÇÃO DO PEDIDO
        ================================================== -->
-  <aside class="carrinho" id="carrinho">
-    <h2>Seu Pedido</h2>
 
-    <div class="carrinho-itens" id="carrinho-itens">
-      <p class="carrinho-vazio">Seu carrinho está vazio</p>
-    </div>
+  <div class="modal" id="modal-pedido" aria-hidden="true">
 
-    <div class="carrinho-total">
-      <span>Total:</span>
-      <strong id="carrinho-total-valor">R$ 0,00</strong>
-    </div>
+    <div class="modal-conteudo" role="dialog" aria-modal="true" aria-labelledby="titulo-modal">
 
-    <button id="btn-finalizar" class="btn-finalizar">
-      Finalizar Pedido
-    </button>
-  </aside>
+      <!-- FECHAR -->
 
-  <!-- ==================================================
-       MODAL - DADOS DO CLIENTE / ENDEREÇO
-       ================================================== -->
-  <div class="modal" id="modal-pedido">
-    <div class="modal-conteudo">
-      <button class="modal-fechar" id="modal-fechar">&times;</button>
+      <button type="button" class="modal-fechar" id="modal-fechar" aria-label="Fechar">
+        &times;
+      </button>
 
-      <h2>Finalizar Pedido</h2>
+
+      <h2 id="titulo-modal">
+        Finalizar Pedido
+      </h2>
+
+
+      <!-- ==================================================
+           FORMULÁRIO
+           ================================================== -->
 
       <form id="form-pedido">
 
-        <label for="nome">Nome completo</label>
-        <input type="text" id="nome" name="nome" required />
 
-        <label for="telefone">WhatsApp</label>
-        <input type="tel" id="telefone" name="telefone" required placeholder="(81) 9xxxx-xxxx" />
-        <label for="qual-mesa">Mesa</label>
-        <select id="qual-mesa" name="qual-mesa" required>
-          <option value="">Selecione</option>
-          <option value="m01">01</option>
-          <option value="m02">02</option>
-          <option value="m03">03</option>
-        </select>
+        <!-- NOME -->
 
-        <label for="forma-pagamento">Forma de pagamento</label>
-        <select id="forma-pagamento" name="forma-pagamento" required>
-          <option value="">Selecione</option>
-          <option value="pix">Pix</option>
-          <option value="dinheiro">Dinheiro</option>
-          <option value="cartao">Cartão (na entrega)</option>
-        </select>
+        <div class="campo">
 
-        <label for="observacoes">Observações</label>
-        <textarea id="observacoes" name="observacoes" rows="2"></textarea>
+          <label for="nome">
+            Nome completo
+          </label>
 
-        <button type="submit" class="btn-finalizar">
+          <input type="text" id="nome" name="nome" placeholder="Digite seu nome" maxlength="100" autocomplete="name"
+            required />
+
+        </div>
+
+
+        <!-- WHATSAPP -->
+
+        <div class="campo">
+
+          <label for="telefone">
+            WhatsApp
+          </label>
+
+          <input type="tel" id="telefone" name="telefone" placeholder="(81) 9xxxx-xxxx" maxlength="20"
+            autocomplete="tel" required />
+
+        </div>
+
+
+        <!-- MESA -->
+
+        <div class="campo">
+
+          <label for="qual-mesa">
+            Mesa
+          </label>
+
+          <select id="qual-mesa" name="mesa" required>
+
+            <option value="">
+              Selecione sua mesa
+            </option>
+
+            <!--
+              As mesas serão carregadas
+              dinamicamente pelo JavaScript.
+
+              Exemplo:
+
+              Mesa 01
+              Mesa 02
+              Mesa 03
+              ...
+            -->
+
+          </select>
+
+        </div>
+
+
+        <!-- PAGAMENTO -->
+
+        <div class="campo">
+
+          <label for="forma-pagamento">
+            Forma de pagamento
+          </label>
+
+          <select id="forma-pagamento" name="forma_pagamento" required>
+
+            <option value="">
+              Selecione
+            </option>
+
+            <option value="pix">
+              Pix
+            </option>
+
+            <option value="dinheiro">
+              Dinheiro
+            </option>
+
+            <option value="cartao">
+              Cartão
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- OBSERVAÇÕES -->
+
+        <div class="campo">
+
+          <label for="observacoes">
+            Observações
+          </label>
+
+          <textarea id="observacoes" name="observacoes" rows="3" maxlength="500"
+            placeholder="Ex.: Sem cebola..."></textarea>
+
+        </div>
+
+
+        <!-- MENSAGEM -->
+
+        <p id="mensagem-pedido" class="mensagem-pedido" role="status" aria-live="polite"></p>
+
+
+        <!-- CONFIRMAR -->
+
+        <button type="submit" class="btn-finalizar" id="btn-confirmar-pedido">
           Confirmar Pedido
         </button>
 
       </form>
+
     </div>
+
   </div>
 
-  </main>
-  <!-- Supabase -->
+
+  <!-- ==================================================
+       SUPABASE
+       ================================================== -->
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- JavaScript da página -->
+
+  <!-- ==================================================
+       JAVASCRIPT DO QUIOSQUE
+       ================================================== -->
+
   <script src="script.js"></script>
+
 </body>
 
 </html>

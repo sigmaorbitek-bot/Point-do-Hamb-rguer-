@@ -30,14 +30,13 @@
   --cor-input: #ffffff;
 
   /* Bordas */
-  --borda: rgba(0, 0, 0, 0.10);
+  --borda: rgba(0, 0, 0, 0.1);
   --borda-clara: rgba(255, 255, 255, 0.08);
 
   /* Sombras */
   --sombra: 0 5px 20px rgba(0, 0, 0, 0.12);
   --sombra-forte: 0 15px 50px rgba(0, 0, 0, 0.45);
 }
-
 
 /* ==========================================================================
    2. RESET UNIVERSAL
@@ -49,7 +48,6 @@
   box-sizing: border-box;
 }
 
-
 /* ==========================================================================
    3. HTML
    ========================================================================== */
@@ -59,7 +57,6 @@ html {
   scroll-behavior: smooth;
 }
 
-
 /* ==========================================================================
    4. BODY
    ========================================================================== */
@@ -68,11 +65,7 @@ body {
   min-height: 100vh;
 
   background:
-    radial-gradient(
-      circle at top,
-      rgba(255, 69, 0, 0.08),
-      transparent 35%
-    ),
+    radial-gradient(circle at top, rgba(255, 69, 0, 0.08), transparent 35%),
     var(--cor-fundo);
 
   color: var(--cor-texto-principal);
@@ -83,7 +76,6 @@ body {
 
   animation: fadeInTela 0.8s ease;
 }
-
 
 /* ==========================================================================
    5. NAVBAR
@@ -102,15 +94,9 @@ body {
 
   justify-content: center;
 
-  background:
-    linear-gradient(
-      135deg,
-      var(--cor-destaque),
-      #c93200
-    );
+  background: linear-gradient(135deg, var(--cor-destaque), #c93200);
 
-  box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
 
   position: sticky;
 
@@ -118,7 +104,6 @@ body {
 
   z-index: 50;
 }
-
 
 /* ==========================================================================
    6. LOGO DO PAINEL
@@ -160,7 +145,6 @@ body {
   font-size: 0.7rem;
 }
 
-
 /* ==========================================================================
    7. MAIN
    ========================================================================== */
@@ -174,7 +158,6 @@ body {
 
   padding: 40px 20px 50px;
 }
-
 
 /* ==========================================================================
    8. CABEÇALHO DO PAINEL
@@ -193,12 +176,11 @@ body {
 
   padding: 7px 14px;
 
-  background:
-    linear-gradient(
-      135deg,
-      var(--cor-destaque),
-      var(--cor-destaque-hover)
-    );
+  background: linear-gradient(
+    135deg,
+    var(--cor-destaque),
+    var(--cor-destaque-hover)
+  );
 
   border-radius: 50px;
 
@@ -208,8 +190,7 @@ body {
 
   font-weight: bold;
 
-  box-shadow:
-    0 5px 15px rgba(255, 69, 0, 0.25);
+  box-shadow: 0 5px 15px rgba(255, 69, 0, 0.25);
 }
 
 .admin-header p {
@@ -220,7 +201,6 @@ body {
   line-height: 1.5;
 }
 
-
 /* ==========================================================================
    9. RESUMO
    ========================================================================== */
@@ -228,8 +208,7 @@ body {
 .resumo-admin {
   display: grid;
 
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 
   gap: 18px;
 
@@ -261,8 +240,7 @@ body {
 .resumo-card:hover {
   transform: translateY(-3px);
 
-  box-shadow:
-    0 10px 25px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
 }
 
 .resumo-icon {
@@ -276,7 +254,7 @@ body {
 
   justify-content: center;
 
-  background: rgba(255, 69, 0, 0.10);
+  background: rgba(255, 69, 0, 0.1);
 
   border-radius: 12px;
 
@@ -305,7 +283,6 @@ body {
   font-size: 1.25rem;
 }
 
-
 /* ==========================================================================
    10. SEÇÕES
    ========================================================================== */
@@ -323,7 +300,6 @@ body {
 
   box-shadow: var(--sombra);
 }
-
 
 /* ==========================================================================
    11. TÍTULO DAS SEÇÕES
@@ -350,7 +326,7 @@ body {
 
   justify-content: center;
 
-  background: rgba(255, 69, 0, 0.10);
+  background: rgba(255, 69, 0, 0.1);
 
   border-radius: 10px;
 
@@ -375,7 +351,6 @@ body {
   line-height: 1.5;
 }
 
-
 /* ==========================================================================
    12. FORMULÁRIOS
    ========================================================================== */
@@ -383,8 +358,7 @@ body {
 .formulario {
   display: grid;
 
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 
   gap: 16px;
 }
@@ -448,8 +422,7 @@ body {
 
   border-color: var(--cor-destaque);
 
-  box-shadow:
-    0 0 0 3px rgba(255, 69, 0, 0.12);
+  box-shadow: 0 0 0 3px rgba(255, 69, 0, 0.12);
 }
 
 .campo input[type="file"] {
@@ -462,7 +435,6 @@ body {
   font-size: 0.75rem;
 }
 
-
 /* ==========================================================================
    13. BOTÃO PRINCIPAL
    ========================================================================== */
@@ -474,12 +446,11 @@ body {
 
   padding: 11px 16px;
 
-  background:
-    linear-gradient(
-      135deg,
-      var(--cor-destaque),
-      var(--cor-destaque-hover)
-    );
+  background: linear-gradient(
+    135deg,
+    var(--cor-destaque),
+    var(--cor-destaque-hover)
+  );
 
   color: #ffffff;
 
@@ -502,8 +473,7 @@ body {
 .btn-principal:hover {
   transform: translateY(-2px);
 
-  box-shadow:
-    0 8px 20px rgba(255, 69, 0, 0.25);
+  box-shadow: 0 8px 20px rgba(255, 69, 0, 0.25);
 
   filter: brightness(1.05);
 }
@@ -511,7 +481,6 @@ body {
 .btn-principal:active {
   transform: scale(0.98);
 }
-
 
 /* ==========================================================================
    14. MENSAGENS
@@ -528,7 +497,6 @@ body {
 
   line-height: 1.5;
 }
-
 
 /* ==========================================================================
    15. BUSCA
@@ -563,10 +531,8 @@ body {
 
   border-color: var(--cor-destaque);
 
-  box-shadow:
-    0 0 0 3px rgba(255, 69, 0, 0.12);
+  box-shadow: 0 0 0 3px rgba(255, 69, 0, 0.12);
 }
-
 
 /* ==========================================================================
    16. PRODUTOS
@@ -575,8 +541,7 @@ body {
 .lista-admin {
   display: grid;
 
-  grid-template-columns:
-    repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 
   gap: 18px;
 }
@@ -600,8 +565,7 @@ body {
 .card-admin:hover {
   transform: translateY(-3px);
 
-  box-shadow:
-    0 10px 25px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.16);
 }
 
 .card-admin img {
@@ -685,7 +649,6 @@ body {
   filter: brightness(0.95);
 }
 
-
 /* ==========================================================================
    17. ESTADO VAZIO
    ========================================================================== */
@@ -699,7 +662,6 @@ body {
 
   text-align: center;
 }
-
 
 /* ==========================================================================
    18. PEDIDOS
@@ -783,7 +745,6 @@ body {
   font-weight: bold;
 }
 
-
 /* ==========================================================================
    19. CONFIGURAÇÕES DE DELIVERY / QUIOSQUE
    ========================================================================== */
@@ -791,8 +752,7 @@ body {
 .config-grid {
   display: grid;
 
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 
   gap: 16px;
 }
@@ -829,7 +789,6 @@ body {
   line-height: 1.4;
 }
 
-
 /* ==========================================================================
    20. MESAS DO QUIOSQUE
    ========================================================================== */
@@ -837,8 +796,7 @@ body {
 .lista-mesas {
   display: grid;
 
-  grid-template-columns:
-    repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
 
   gap: 12px;
 }
@@ -891,7 +849,6 @@ body {
   font-size: 0.75rem;
 }
 
-
 /* ==========================================================================
    21. FUNCIONAMENTO DA LOJA
    ========================================================================== */
@@ -931,7 +888,6 @@ body {
 
   font-size: 0.78rem;
 }
-
 
 /* ==========================================================================
    22. SWITCH
@@ -997,7 +953,6 @@ body {
   transform: translateX(22px);
 }
 
-
 /* ==========================================================================
    23. HORÁRIOS
    ========================================================================== */
@@ -1015,11 +970,7 @@ body {
 .horario-item {
   display: grid;
 
-  grid-template-columns:
-    minmax(120px, 1fr)
-    auto
-    auto
-    auto;
+  grid-template-columns: minmax(120px, 1fr) auto auto auto;
 
   align-items: center;
 
@@ -1065,7 +1016,6 @@ body {
 
   font-size: 0.75rem;
 }
-
 
 /* ==========================================================================
    24. RELATÓRIOS
@@ -1133,7 +1083,6 @@ body {
   border-color: var(--cor-destaque);
 }
 
-
 /* ==========================================================================
    25. CARDS DO RELATÓRIO
    ========================================================================== */
@@ -1141,8 +1090,7 @@ body {
 .relatorio-resumo {
   display: grid;
 
-  grid-template-columns:
-    repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 
   gap: 14px;
 
@@ -1184,7 +1132,6 @@ body {
 
   font-size: 1.3rem;
 }
-
 
 /* ==========================================================================
    26. TABELA DE RELATÓRIO
@@ -1242,7 +1189,6 @@ body {
   font-weight: bold;
 }
 
-
 /* ==========================================================================
    27. BOTÕES DE RELATÓRIO
    ========================================================================== */
@@ -1299,7 +1245,6 @@ body {
   color: var(--cor-fundo);
 }
 
-
 /* ==========================================================================
    28. STATUS DOS PEDIDOS
    ========================================================================== */
@@ -1319,7 +1264,6 @@ body {
 .status-cancelado {
   color: var(--erro) !important;
 }
-
 
 /* ==========================================================================
    29. SAÍDA
@@ -1368,7 +1312,6 @@ body {
   transform: translateY(-2px);
 }
 
-
 /* ==========================================================================
    30. ANIMAÇÕES
    ========================================================================== */
@@ -1383,13 +1326,11 @@ body {
   }
 }
 
-
 /* ==========================================================================
    31. TABLET
    ========================================================================== */
 
 @media (max-width: 768px) {
-
   .admin-navbar {
     padding: 8px 18px;
   }
@@ -1409,8 +1350,7 @@ body {
   }
 
   .resumo-admin {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .resumo-card:last-child {
@@ -1434,25 +1374,19 @@ body {
   }
 
   .relatorio-resumo {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .horario-item {
-    grid-template-columns:
-      1fr
-      auto
-      auto;
+    grid-template-columns: 1fr auto auto;
   }
 }
-
 
 /* ==========================================================================
    32. CELULAR
    ========================================================================== */
 
 @media (max-width: 520px) {
-
   .admin-navbar {
     min-height: 62px;
 
@@ -1568,13 +1502,11 @@ body {
   }
 }
 
-
 /* ==========================================================================
    33. CELULARES PEQUENOS
    ========================================================================== */
 
 @media (max-width: 360px) {
-
   .admin-logo-text p {
     display: none;
   }
