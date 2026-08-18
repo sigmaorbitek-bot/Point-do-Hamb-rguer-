@@ -56,10 +56,17 @@
 
     <section class="cardapio" id="cardapio">
 
-      <h2>
-        Cardápio Digital
-      </h2>
+      <header class="cardapio-header">
 
+        <h2>
+          Cardápio Digital
+        </h2>
+
+        <p>
+          Escolha seus produtos e monte seu pedido.
+        </p>
+
+      </header>
 
       <!-- ==================================================
            BARRA DE PESQUISA
@@ -78,42 +85,25 @@
 
       <div class="filtros">
 
-        <button type="button" class="filtro-btn ativo" data-categoria="todos">
+        <button class="filtro-btn ativo" data-categoria="todos" type="button">
           Todos
         </button>
 
-        <button type="button" class="filtro-btn" data-categoria="hambúrgueres">
-          🍔 Hambúrgueres
+        <button class="filtro-btn" data-categoria="lanches" type="button">
+          🍔 Lanches
         </button>
 
-        <button type="button" class="filtro-btn" data-categoria="pastel">
-          🥟 Pastéis
-        </button>
-
-        <button type="button" class="filtro-btn" data-categoria="cachorro-quente">
-          🌭 Cachorro-quente
-        </button>
-
-        <button type="button" class="filtro-btn" data-categoria="porções">
-          🍟 Porções
-        </button>
-
-        <button type="button" class="filtro-btn" data-categoria="bebidas">
+        <button class="filtro-btn" data-categoria="bebidas" type="button">
           🥤 Bebidas
         </button>
 
-        <button type="button" class="filtro-btn" data-categoria="sucos">
-          🧃 Sucos
+        <button class="filtro-btn" data-categoria="sobremesas" type="button">
+          🍨 Sobremesas
         </button>
 
         <button type="button" class="filtro-btn" data-categoria="combos">
           ⭐ Combos
         </button>
-
-        <button type="button" class="filtro-btn" data-categoria="sobremesas">
-          🍨 Sobremesas
-        </button>
-
       </div>
 
 
@@ -334,17 +324,8 @@
   </div>
 
 
-  <!-- ==================================================
-       SUPABASE
-       ================================================== -->
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-
-  <!-- ==================================================
-       JAVASCRIPT DO QUIOSQUE
-       ================================================== -->
-
+  <script src="../config.js"></script>
   <script src="script.js"></script>
 
 </body>

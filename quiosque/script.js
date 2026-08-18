@@ -1,21 +1,3 @@
-// ==================================================
-// CONFIGURAÇÃO DO SUPABASE
-// ==================================================
-
-const SUPABASE_URL = "https://bhukrxwjfjpkkuejtqtv.supabase.co";
-
-const SUPABASE_ANON_KEY = "sb_publishable_ShiIeYHrnrjGKtdf1va9xw_1MRlYcKn";
-
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY,
-);
-
-// ==================================================
-// CONFIGURAÇÕES GERAIS
-// ==================================================
-
-const TAXA_ENTREGA = 5.0; // ajuste aqui se a taxa mudar
 
 // ==================================================
 // ELEMENTOS DA PÁGINA

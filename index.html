@@ -1,127 +1,107 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+  <meta charset="UTF-8" />
 
-    <meta
-      name="description"
-      content="Point do Hambúrguer - Lanches artesanais em Altinho-PE."
-    />
-    <meta name="theme-color" content="#ff4500" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Point do Hambúrguer</title>
+  <meta name="description" content="Point do Hambúrguer - Lanches artesanais em Altinho-PE." />
+  <meta name="theme-color" content="#ff4500" />
 
-    <link rel="icon" type="image/png" href="./assets/favicon.svg" />
+  <title>Point do Hambúrguer</title>
 
-    <link rel="stylesheet" href="style.css" />
-  </head>
+  <link rel="icon" type="image/png" href="./assets/favicon.svg" />
 
-  <body>
-    <main id="tela-boas-vindas">
-      <section class="boas-vindas-container" aria-labelledby="titulo-loja">
-        <div class="boas-vindas-box">
-          <!-- LOGO -->
-          <div class="bv-logo-container">
-            <img
-              src="./assets/point.png"
-              alt="Logo do Point do Hambúrguer"
-              class="bv-logo"
-            />
-          </div>
+  <link rel="stylesheet" href="style.css" />
+</head>
 
-          <!-- TÍTULO -->
-          <h1 id="titulo-loja" class="bv-titulo">
-            Bem-vindo ao Point do Hambúrguer!
-          </h1>
-
-          <!-- SUBTÍTULO -->
-          <p class="bv-subtitulo">
-            Peça seu lanche favorito em poucos cliques e receba onde estiver.
-          </p>
-
-          <!-- DIVISOR -->
-          <div class="bv-divisor" aria-hidden="true"></div>
-
-          <!-- DESCRIÇÃO -->
-          <p class="bv-descricao">
-            Lanches artesanais feitos para matar sua fome.
-          </p>
-
-          <!-- DIFERENCIAIS -->
-          <div
-            class="bv-features"
-            aria-label="Diferenciais do Point do Hambúrguer"
-          >
-            <div class="bv-feature">
-              <span class="bv-icon" aria-hidden="true">🍔</span>
-              <span>Lanches Artesanais</span>
-            </div>
-
-            <div class="bv-feature">
-              <span class="bv-icon" aria-hidden="true">🚚</span>
-              <span>Entrega Rápida</span>
-            </div>
-
-            <div class="bv-feature">
-              <span class="bv-icon" aria-hidden="true">🔥</span>
-              <span>Feito na Hora</span>
-            </div>
-          </div>
-
-          <!-- STATUS DA LOJA -->
-          <div id="status-loja" class="status-loja" aria-live="polite">
-            <span id="status-icone" class="status-icone" aria-hidden="true">
-              🟢
-            </span>
-
-            <div class="status-conteudo">
-              <strong id="status-texto"> Verificando horário... </strong>
-
-              <span id="status-horario"> Aguarde um momento </span>
-            </div>
-          </div>
-
-          <!-- OPÇÕES DE ATENDIMENTO -->
-          <div class="bv-opcoes">
-            <button
-              id="btn-delivery"
-              class="bv-btn"
-              type="button"
-              onclick="entrar('delivery')"
-            >
-              🛵 Quero Delivery
-            </button>
-
-            <button
-              id="btn-quiosque"
-              class="bv-btn"
-              type="button"
-              onclick="entrar('quiosque')"
-            >
-              🛖 Estou no Quiosque
-            </button>
-
-            <a href="./admin/index.html" class="link-sistema">
-              ⚙️ Área do sistema
-            </a>
-          </div>
-
-          <!-- LOCALIZAÇÃO -->
-          <p class="bv-rodape">
-            📍 Praça Dr. José Ferreira de Lima
-            <br />
-            Quiosque • Altinho - PE
-          </p>
+<body>
+  <main id="tela-boas-vindas">
+    <section class="boas-vindas-container" aria-labelledby="titulo-loja">
+      <div class="boas-vindas-box">
+        <!-- LOGO -->
+        <div class="bv-logo-container">
+          <img src="./assets/point.png" alt="Logo do Point do Hambúrguer" class="bv-logo" />
         </div>
-      </section>
-    </main>
 
-    <!-- Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <!-- TÍTULO -->
+        <h1 id="titulo-loja" class="bv-titulo">
+          Bem-vindo ao Point do Hambúrguer!
+        </h1>
 
-    <!-- JavaScript da página -->
-    <script src="script.js"></script>
-  </body>
+        <!-- SUBTÍTULO -->
+        <p class="bv-subtitulo">
+          Peça seu lanche favorito em poucos cliques e receba onde estiver.
+        </p>
+
+        <!-- DIVISOR -->
+        <div class="bv-divisor" aria-hidden="true"></div>
+
+        <!-- DESCRIÇÃO -->
+        <p class="bv-descricao">
+          Lanches artesanais feitos para matar sua fome.
+        </p>
+
+        <!-- DIFERENCIAIS -->
+        <div class="bv-features" aria-label="Diferenciais do Point do Hambúrguer">
+          <div class="bv-feature">
+            <span class="bv-icon" aria-hidden="true">🍔</span>
+            <span>Lanches Artesanais</span>
+          </div>
+
+          <div class="bv-feature">
+            <span class="bv-icon" aria-hidden="true">🚚</span>
+            <span>Entrega Rápida</span>
+          </div>
+
+          <div class="bv-feature">
+            <span class="bv-icon" aria-hidden="true">🔥</span>
+            <span>Feito na Hora</span>
+          </div>
+        </div>
+
+        <!-- STATUS DA LOJA -->
+        <div id="status-loja" class="status-loja" aria-live="polite">
+          <span id="status-icone" class="status-icone" aria-hidden="true">
+            🟢
+          </span>
+
+          <div class="status-conteudo">
+            <strong id="status-texto"> Verificando horário... </strong>
+
+            <span id="status-horario"> Aguarde um momento </span>
+          </div>
+        </div>
+
+        <!-- OPÇÕES DE ATENDIMENTO -->
+        <div class="bv-opcoes">
+          <button id="btn-delivery" class="bv-btn" type="button" onclick="entrar('delivery')">
+            🛵 Quero Delivery
+          </button>
+
+          <button id="btn-quiosque" class="bv-btn" type="button" onclick="entrar('quiosque')">
+            🛖 Estou no Quiosque
+          </button>
+
+          <a href="./admin/index.html" class="link-sistema">
+            ⚙️ Área do sistema
+          </a>
+        </div>
+
+        <!-- LOCALIZAÇÃO -->
+        <p class="bv-rodape">
+          📍 Praça Dr. José Ferreira de Lima
+          <br />
+          Quiosque • Altinho - PE
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+
 </html>
