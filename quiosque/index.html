@@ -1,333 +1,323 @@
 <!doctype html>
 <html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
 
-<head>
-  <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Point do Hambúrguer - Lanches artesanais em Altinho-PE."
+    />
 
-  <meta name="description" content="Point do Hambúrguer - Lanches artesanais em Altinho-PE." />
+    <meta name="theme-color" content="#ff4500" />
 
-  <meta name="theme-color" content="#ff4500" />
+    <title>Quiosque | Point do Hambúrguer</title>
 
-  <title>Quiosque | Point do Hambúrguer</title>
+    <link rel="icon" href="../assets/favicon.svg" type="image/x-icon" />
 
-  <link rel="icon" type="image/png" href="../assets/favicon.svg" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-  <link rel="stylesheet" href="style.css" />
-</head>
-
-<body>
-
-  <!-- ==================================================
-       CABEÇALHO
-       ================================================== -->
-
-  <nav class="navbar">
-
-    <div class="navbar-logo">
-
-      <img src="../assets/point.png" alt="Logo do Point do Hambúrguer" class="icon" />
-
-      <div class="navbar-nome">
-
-        <h1>🛖 Quiosque</h1>
-
-        <p>
-          Faça seu pedido diretamente aqui
-        </p>
-
-      </div>
-
-    </div>
-
-  </nav>
-
-
-  <!-- ==================================================
-       CONTEÚDO PRINCIPAL
-       ================================================== -->
-
-  <main>
-
+  <body>
     <!-- ==================================================
-         CARDÁPIO
+         CABEÇALHO
          ================================================== -->
 
-    <section class="cardapio" id="cardapio">
+    <header class="navbar">
+      <div class="navbar-logo">
+        <img
+          class="icon"
+          src="../assets/point.png"
+          alt="Logo do Point do Hambúrguer"
+        />
 
-      <header class="cardapio-header">
+        <div class="navbar-nome">
+          <h1>🛖 Quiosque</h1>
 
-        <h2>
-          Cardápio Digital
-        </h2>
-
-        <p>
-          Escolha seus produtos e monte seu pedido.
-        </p>
-
-      </header>
-
-      <!-- ==================================================
-           BARRA DE PESQUISA
-           ================================================== -->
-
-      <div class="busca">
-
-        <input type="search" id="busca-input" placeholder="🔍 Buscar lanche..." autocomplete="off" />
-
+          <p>Faça seu pedido diretamente aqui</p>
+        </div>
       </div>
-
-
-      <!-- ==================================================
-           FILTROS
-           ================================================== -->
-
-      <div class="filtros">
-
-        <button class="filtro-btn ativo" data-categoria="todos" type="button">
-          Todos
-        </button>
-
-        <button class="filtro-btn" data-categoria="lanches" type="button">
-          🍔 Lanches
-        </button>
-
-        <button class="filtro-btn" data-categoria="bebidas" type="button">
-          🥤 Bebidas
-        </button>
-
-        <button class="filtro-btn" data-categoria="sobremesas" type="button">
-          🍨 Sobremesas
-        </button>
-
-        <button type="button" class="filtro-btn" data-categoria="combos">
-          ⭐ Combos
-        </button>
-      </div>
-
-
-      <!-- ==================================================
-           LISTA DE PRODUTOS
-           ================================================== -->
-
-      <div class="lista-itens" id="lista-itens">
-
-        <!--
-          Os produtos serão carregados
-          pelo JavaScript através do Supabase.
-        -->
-
-        <p class="estado-cardapio">
-          Carregando cardápio...
-        </p>
-
-      </div>
-
-    </section>
-
+    </header>
 
     <!-- ==================================================
-         CARRINHO
+         CONTEÚDO PRINCIPAL
          ================================================== -->
 
-    <aside class="carrinho" id="carrinho">
-
-      <h2>
-        Seu Pedido
-      </h2>
-
-
-      <!-- ITENS DO CARRINHO -->
-
-      <div class="carrinho-itens" id="carrinho-itens">
-
-        <p class="carrinho-vazio">
-          Seu carrinho está vazio
-        </p>
-
-      </div>
-
-
-      <!-- TOTAL -->
-
-      <div class="carrinho-total">
-
-        <span>
-          Total:
-        </span>
-
-        <strong id="carrinho-total-valor">
-          R$ 0,00
-        </strong>
-
-      </div>
-
-
-      <!-- FINALIZAR -->
-
-      <button id="btn-finalizar" class="btn-finalizar" type="button" disabled>
-        Finalizar Pedido
-      </button>
-
-    </aside>
-
-  </main>
-
-
-  <!-- ==================================================
-       MODAL — FINALIZAÇÃO DO PEDIDO
-       ================================================== -->
-
-  <div class="modal" id="modal-pedido" aria-hidden="true">
-
-    <div class="modal-conteudo" role="dialog" aria-modal="true" aria-labelledby="titulo-modal">
-
-      <!-- FECHAR -->
-
-      <button type="button" class="modal-fechar" id="modal-fechar" aria-label="Fechar">
-        &times;
-      </button>
-
-
-      <h2 id="titulo-modal">
-        Finalizar Pedido
-      </h2>
-
-
+    <main>
       <!-- ==================================================
-           FORMULÁRIO
+           CARDÁPIO
            ================================================== -->
 
-      <form id="form-pedido">
+      <section class="cardapio" id="cardapio">
+        <!-- CABEÇALHO DO CARDÁPIO -->
 
+        <header class="cardapio-header">
+          <h2>Cardápio Digital</h2>
 
-        <!-- NOME -->
+          <p>Escolha seus produtos e monte seu pedido.</p>
+        </header>
 
-        <div class="campo">
+        <!-- ==================================================
+             BUSCA
+             ================================================== -->
 
-          <label for="nome">
-            Nome completo
-          </label>
-
-          <input type="text" id="nome" name="nome" placeholder="Digite seu nome" maxlength="100" autocomplete="name"
-            required />
-
+        <div class="busca">
+          <input
+            type="search"
+            id="busca-input"
+            placeholder="🔍 Buscar lanche..."
+            autocomplete="off"
+          />
         </div>
 
+        <!-- ==================================================
+             FILTROS
+             ================================================== -->
 
-        <!-- WHATSAPP -->
+        <nav class="filtros" aria-label="Categorias do cardápio">
+          <button type="button" class="filtro-btn ativo" data-categoria="todos">
+            Todos
+          </button>
 
-        <div class="campo">
+          <button type="button" class="filtro-btn" data-categoria="lanches">
+            🍔 Lanches
+          </button>
 
-          <label for="telefone">
-            WhatsApp
-          </label>
+          <button type="button" class="filtro-btn" data-categoria="bebidas">
+            🥤 Bebidas
+          </button>
 
-          <input type="tel" id="telefone" name="telefone" placeholder="(81) 9xxxx-xxxx" maxlength="20"
-            autocomplete="tel" required />
+          <button type="button" class="filtro-btn" data-categoria="sobremesas">
+            🍨 Sobremesas
+          </button>
 
+          <button type="button" class="filtro-btn" data-categoria="combos">
+            ⭐ Combos
+          </button>
+        </nav>
+
+        <!-- ==================================================
+             LISTA DE PRODUTOS
+             ================================================== -->
+
+        <div class="lista-itens" id="lista-itens">
+          <p class="estado-cardapio">Carregando cardápio...</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- ==================================================
+     CARRINHO FLUTUANTE
+     ================================================== -->
+
+    <div class="carrinho-container">
+      <!-- BOTÃO FLUTUANTE -->
+      <button
+        type="button"
+        class="carrinho-flutuante"
+        id="carrinho-flutuante"
+        aria-label="Abrir carrinho"
+        aria-controls="carrinho"
+        aria-expanded="false"
+      >
+        <span class="carrinho-icone">🛒</span>
+        <span class="carrinho-texto">Carrinho</span>
+        <span class="carrinho-contador" id="carrinho-contador">0</span>
+      </button>
+
+      <!-- PAINEL DO CARRINHO -->
+      <aside class="carrinho" id="carrinho" aria-label="Carrinho de compras">
+        <header class="carrinho-head">
+          <div>
+            <h2>🛒 Seu pedido</h2>
+            <p>Confira seus itens</p>
+          </div>
+
+          <button
+            type="button"
+            class="carrinho-fechar"
+            id="carrinho-fechar"
+            aria-label="Fechar carrinho"
+          >
+            &times;
+          </button>
+        </header>
+
+        <div class="carrinho-itens" id="carrinho-itens">
+          <p class="carrinho-vazio">Seu carrinho está vazio</p>
         </div>
 
-
-        <!-- MESA -->
-
-        <div class="campo">
-
-          <label for="qual-mesa">
-            Mesa
-          </label>
-
-          <select id="qual-mesa" name="mesa" required>
-
-            <option value="">
-              Selecione sua mesa
-            </option>
-
-            <!--
-              As mesas serão carregadas
-              dinamicamente pelo JavaScript.
-
-              Exemplo:
-
-              Mesa 01
-              Mesa 02
-              Mesa 03
-              ...
-            -->
-
-          </select>
-
+        <div class="carrinho-total">
+          <span>Total</span>
+          <strong id="carrinho-total-valor">R$ 0,00</strong>
         </div>
 
-
-        <!-- PAGAMENTO -->
-
-        <div class="campo">
-
-          <label for="forma-pagamento">
-            Forma de pagamento
-          </label>
-
-          <select id="forma-pagamento" name="forma_pagamento" required>
-
-            <option value="">
-              Selecione
-            </option>
-
-            <option value="pix">
-              Pix
-            </option>
-
-            <option value="dinheiro">
-              Dinheiro
-            </option>
-
-            <option value="cartao">
-              Cartão
-            </option>
-
-          </select>
-
-        </div>
-
-
-        <!-- OBSERVAÇÕES -->
-
-        <div class="campo">
-
-          <label for="observacoes">
-            Observações
-          </label>
-
-          <textarea id="observacoes" name="observacoes" rows="3" maxlength="500"
-            placeholder="Ex.: Sem cebola..."></textarea>
-
-        </div>
-
-
-        <!-- MENSAGEM -->
-
-        <p id="mensagem-pedido" class="mensagem-pedido" role="status" aria-live="polite"></p>
-
-
-        <!-- CONFIRMAR -->
-
-        <button type="submit" class="btn-finalizar" id="btn-confirmar-pedido">
-          Confirmar Pedido
+        <button type="button" class="btn-finalizar" id="btn-finalizar" disabled>
+          Finalizar Pedido
         </button>
-
-      </form>
-
+      </aside>
     </div>
 
-  </div>
+    <!-- ==================================================
+         MODAL — FINALIZAÇÃO DO PEDIDO
+         ================================================== -->
 
+    <div class="modal" id="modal-pedido" aria-hidden="true">
+      <div
+        class="modal-conteudo"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-modal"
+      >
+        <!-- FECHAR -->
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="../config.js"></script>
-  <script src="script.js"></script>
+        <button
+          type="button"
+          class="modal-fechar"
+          id="modal-fechar"
+          aria-label="Fechar"
+        >
+          &times;
+        </button>
 
-</body>
+        <!-- CABEÇALHO -->
 
+        <header class="modal-header">
+          <h2 id="titulo-modal">Finalizar Pedido</h2>
+
+          <p>Confira seus dados antes de confirmar.</p>
+        </header>
+
+        <!-- ==================================================
+             RESUMO DO PEDIDO
+             ================================================== -->
+
+        <div class="resumo-pedido" id="resumo-pedido">
+          <div>
+            <span> Subtotal </span>
+
+            <strong id="resumo-subtotal"> R$ 0,00 </strong>
+          </div>
+
+          <div>
+            <span> Total </span>
+
+            <strong id="resumo-total"> R$ 0,00 </strong>
+          </div>
+        </div>
+
+        <!-- ==================================================
+             FORMULÁRIO
+             ================================================== -->
+
+        <form id="form-pedido">
+          <!-- NOME -->
+
+          <div class="campo">
+            <label for="nome"> Nome completo </label>
+
+            <input
+              type="text"
+              id="nome"
+              name="nome"
+              placeholder="Digite seu nome"
+              maxlength="100"
+              autocomplete="name"
+              required
+            />
+          </div>
+
+          <!-- WHATSAPP -->
+
+          <div class="campo">
+            <label for="telefone"> WhatsApp </label>
+
+            <input
+              type="tel"
+              id="telefone"
+              name="telefone"
+              placeholder="(81) 9xxxx-xxxx"
+              maxlength="20"
+              autocomplete="tel"
+              required
+            />
+          </div>
+
+          <!-- MESA -->
+
+          <div class="campo">
+            <label for="qual-mesa"> Mesa </label>
+
+            <select id="qual-mesa" name="mesa" required>
+              <option value="">Selecione sua mesa</option>
+            </select>
+          </div>
+
+          <!-- PAGAMENTO -->
+
+          <div class="campo">
+            <label for="forma-pagamento"> Forma de pagamento </label>
+
+            <select id="forma-pagamento" name="forma_pagamento" required>
+              <option value="">Selecione</option>
+
+              <option value="pix">Pix</option>
+
+              <option value="dinheiro">Dinheiro</option>
+
+              <option value="cartao">Cartão</option>
+            </select>
+          </div>
+
+          <!-- OBSERVAÇÕES -->
+
+          <div class="campo">
+            <label for="observacoes"> Observações </label>
+
+            <textarea
+              id="observacoes"
+              name="observacoes"
+              rows="3"
+              maxlength="500"
+              placeholder="Ex.: Sem cebola..."
+            ></textarea>
+          </div>
+
+          <!-- MENSAGEM -->
+
+          <p
+            id="mensagem-pedido"
+            class="mensagem-pedido"
+            role="status"
+            aria-live="polite"
+          ></p>
+
+          <!-- CONFIRMAR -->
+
+          <button type="submit" class="btn-finalizar" id="btn-confirmar-pedido">
+            Confirmar Pedido
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ==================================================
+         SUPABASE
+         ================================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- ==================================================
+         CONFIGURAÇÃO
+         ================================================== -->
+
+    <script src="../config.js"></script>
+
+    <!-- ==================================================
+         JAVASCRIPT DO QUIOSQUE
+         ================================================== -->
+
+    <script src="quiosque.js"></script>
+  </body>
 </html>
