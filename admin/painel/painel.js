@@ -1,6 +1,5 @@
 // PAINEL ADMINISTRATIVO - POINT DO HAMBÚRGUER
 
-
 // 2. ELEMENTOS DO PAINEL
 
 const totalProdutos = document.getElementById("total-produtos");
@@ -12,6 +11,8 @@ const listaAdmin = document.getElementById("lista-admin");
 const buscarAdmin = document.getElementById("buscar-admin");
 const formProduto = document.getElementById("form-produto");
 const msgCadastro = document.getElementById("msg-cadastro");
+const btnSubmitProduto = formProduto?.querySelector('button[type="submit"]');
+const btnCancelarEdicao = document.getElementById("btn-cancelar-edicao");
 
 const listaPedidos = document.getElementById("lista-pedidos");
 const filtroStatusPedido = document.getElementById("filtro-status-pedido");
@@ -23,8 +24,17 @@ const inputTaxa = document.getElementById("taxa");
 const inputTempo = document.getElementById("tempo");
 const msgDelivery = document.getElementById("msg-delivery");
 
+// ELEMENTOS - CONFIGURAÇÃO DO QUIOSQUE (MESAS)
+
+const formQuiosque = document.getElementById("form-quiosque");
+const inputQuantidadeMesas = document.getElementById("quantidade-mesas");
+const msgQuiosque = document.getElementById("msg-quiosque");
+
 // guarda o id da linha de configuração já existente no banco
 let idConfiguracao = null;
+
+// guarda o id do produto em edição (null = formulário está em modo "cadastrar")
+let produtoEditandoId = null;
 
 // 3. FORMATAÇÃO
 
@@ -34,6 +44,70 @@ function formatarMoeda(valor) {
     currency: "BRL",
   });
 }
+
+// FORMATA TELEFONE PARA EXIBIÇÃO: (81) 95566-6335
+function formatarTelefoneExibicao(telefone) {
+  let digitos = (telefone || "").replace(/\D/g, "");
+
+  // remove o 55 do DDI se vier na frente
+  if (digitos.length > 11 && digitos.startsWith("55")) {
+    digitos = digitos.slice(2);
+  }
+
+  if (digitos.length === 11) {
+    return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 7)}-${digitos.slice(7)}`;
+  }
+
+  if (digitos.length === 10) {
+    return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 6)}-${digitos.slice(6)}`;
+  }
+
+  return telefone || "-";
+}
+
+// FORMATA O NÚMERO DA MESA COM ZERO À ESQUERDA: 02
+function formatarMesa(mesa) {
+  const numero = Number(mesa);
+  return Number.isNaN(numero) ? mesa : String(numero).padStart(2, "0");
+}
+
+// FORMATA TELEFONE PARA O LINK DO WHATSAPP (com DDI 55)
+function formatarNumeroWhatsApp(telefone) {
+  let digitos = (telefone || "").replace(/\D/g, "");
+  if (digitos.startsWith("55") && digitos.length >= 12) return digitos;
+  return `55${digitos}`;
+}
+
+// MONTA A MENSAGEM CONFORME O TIPO DO PEDIDO
+function montarMensagemConfirmacao(pedido) {
+  if (pedido.tipo_pedido === "quiosque") {
+    return `Olá, ${pedido.nome_cliente}! Seu pedido #${pedido.id} está pronto e já vai para a mesa ${formatarMesa(pedido.mesa)}. 🍔`;
+  }
+  return `Olá, ${pedido.nome_cliente}! Muito obrigado pela preferência 🙏🏻 Seu pedido #${pedido.id} está a caminho! 🛵`;
+}
+
+// CONFIRMAR PEDIDO: atualiza status e abre o WhatsApp com a mensagem pronta
+async function confirmarPedido(pedido) {
+  const { error } = await supabaseClient
+    .from("pedidos")
+    .update({ status: "pronto" })
+    .eq("id", pedido.id);
+
+  if (error) {
+    console.error("Erro ao confirmar pedido:", error);
+    alert("Não foi possível confirmar o pedido.");
+    return;
+  }
+
+  const numero = formatarNumeroWhatsApp(pedido.telefone);
+  const mensagem = montarMensagemConfirmacao(pedido);
+  const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
+
+  window.open(url, "_blank");
+
+  await carregarPedidos(filtroStatusPedido?.value || "todos");
+}
+
 // 4. TESTAR SUPABASE
 async function testarSupabase() {
   const { data, error } = await supabaseClient
@@ -51,17 +125,14 @@ async function testarSupabase() {
 
   return true;
 }
+
 // 5. CARREGAR PRODUTOS
 async function carregarProdutos() {
   if (!listaAdmin) {
     return;
   }
 
-  listaAdmin.innerHTML = `
-    <p class="estado-admin">
-      Carregando produtos...
-    </p>
-  `;
+  listaAdmin.innerHTML = `<p class="estado-admin">Carregando produtos...</p>`;
 
   const { data, error } = await supabaseClient
     .from("produtos")
@@ -70,43 +141,31 @@ async function carregarProdutos() {
 
   if (error) {
     console.error("Erro ao carregar produtos:", error);
-
-    listaAdmin.innerHTML = `
-      <p class="estado-admin">
-        Erro ao carregar produtos.
-      </p>
-    `;
-
+    listaAdmin.innerHTML = `<p class="estado-admin">Erro ao carregar produtos.</p>`;
     return;
   }
 
   if (!data || data.length === 0) {
-    listaAdmin.innerHTML = `
-      <p class="estado-admin">
-        Nenhum produto cadastrado.
-      </p>
-    `;
-
-    if (totalProdutos) {
-      totalProdutos.textContent = "0";
-    }
-
+    listaAdmin.innerHTML = `<p class="estado-admin">Nenhum produto cadastrado.</p>`;
+    if (totalProdutos) totalProdutos.textContent = "0";
     return;
   }
 
-  if (totalProdutos) {
-    totalProdutos.textContent = data.length;
-  }
+  if (totalProdutos) totalProdutos.textContent = data.length;
 
   renderizarProdutos(data);
 }
 
 // 6. RENDERIZAR PRODUTOS
+// ==================================================
+// Trocado de innerHTML com template string para createElement/textContent.
+// nome/descricao/categoria vêm do banco, cadastrados pelo próprio painel,
+// então o risco aqui é baixo — mas manter o mesmo padrão em todo o app
+// evita que alguém copie este trecho como "modelo" pra outra tela que
+// recebe dado de cliente (como a de pedidos, corrigida abaixo).
 
 function renderizarProdutos(produtos) {
-  if (!listaAdmin) {
-    return;
-  }
+  if (!listaAdmin) return;
 
   listaAdmin.innerHTML = "";
 
@@ -114,81 +173,82 @@ function renderizarProdutos(produtos) {
     const card = document.createElement("article");
     card.className = "card-admin";
 
-    card.innerHTML = `
-      ${
-        produto.foto
-          ? `
-            <img
-              src="${produto.foto}"
-              alt="${produto.nome}"
-            >
-          `
-          : ""
-      }
-      <div class="card-admin-conteudo">
+    if (produto.foto) {
+      const img = document.createElement("img");
+      img.src = produto.foto;
+      img.alt = produto.nome || "Produto";
+      card.appendChild(img);
+    }
 
-        <h3>
-          ${produto.nome || "Sem nome"}
-        </h3>
+    const conteudo = document.createElement("div");
+    conteudo.className = "card-admin-conteudo";
 
-        <p>
-          ${produto.descricao || "Sem descrição"}
-        </p>
+    const nome = document.createElement("h3");
+    nome.textContent = produto.nome || "Sem nome";
 
-        <p class="preco">
-          ${formatarMoeda(produto.preco)}
-        </p>
+    const descricao = document.createElement("p");
+    descricao.textContent = produto.descricao || "Sem descrição";
 
-        <p>
-          Estoque:
-          ${produto.estoque ?? 0}
-        </p>
+    const preco = document.createElement("p");
+    preco.className = "preco";
+    preco.textContent = formatarMoeda(produto.preco);
 
-        <p>
-          Categoria:
-          ${produto.categoria || "-"}
-        </p>
+    const estoque = document.createElement("p");
+    estoque.textContent = `Estoque: ${produto.estoque ?? 0}`;
 
-        <p>
-          Status:
-          ${produto.ativo ? "Ativo" : "Inativo"}
-        </p>
+    const categoria = document.createElement("p");
+    categoria.textContent = `Categoria: ${produto.categoria || "-"}`;
 
-        <div class="card-admin-acoes">
+    const status = document.createElement("p");
+    status.textContent = `Status: ${produto.ativo ? "Ativo" : "Inativo"}`;
 
-          <button
-            type="button"
-            class="btn-editar"
-            onclick="editarProduto(${produto.id})"
-          >
-            ✏️ Editar
-          </button>
+    const acoes = document.createElement("div");
+    acoes.className = "card-admin-acoes";
 
-          <button
-            type="button"
-            class="btn-remover-produto"
-            onclick="removerProduto(${produto.id})"
-          >
-            🗑️ Remover
-          </button>
+    const btnEditar = document.createElement("button");
+    btnEditar.type = "button";
+    btnEditar.className = "btn-editar";
+    btnEditar.textContent = "✏️ Editar";
+    btnEditar.addEventListener("click", () => editarProduto(produto.id));
 
-        </div>
+    const btnRemover = document.createElement("button");
+    btnRemover.type = "button";
+    btnRemover.className = "btn-remover-produto";
+    btnRemover.textContent = "🗑️ Remover";
+    btnRemover.addEventListener("click", () => removerProduto(produto.id));
 
-      </div>
-    `;
+    acoes.appendChild(btnEditar);
+    acoes.appendChild(btnRemover);
 
+    conteudo.appendChild(nome);
+    conteudo.appendChild(descricao);
+    conteudo.appendChild(preco);
+    conteudo.appendChild(estoque);
+    conteudo.appendChild(categoria);
+    conteudo.appendChild(status);
+    conteudo.appendChild(acoes);
+
+    card.appendChild(conteudo);
     listaAdmin.appendChild(card);
   });
 }
 
-// 7. CADASTRAR PRODUTO
+// 7. CADASTRAR / SALVAR EDIÇÃO DE PRODUTO
+// ==================================================
+// O mesmo formulário agora serve pros dois casos. Se produtoEditandoId
+// estiver preenchido, faz UPDATE em vez de INSERT. editarProduto()
+// (item 10) é quem liga esse modo.
 
 if (formProduto) {
   formProduto.addEventListener("submit", async function (event) {
     event.preventDefault();
 
+    const emEdicao = produtoEditandoId !== null;
+
     if (msgCadastro) {
-      msgCadastro.textContent = "Cadastrando produto...";
+      msgCadastro.textContent = emEdicao
+        ? "Salvando alterações..."
+        : "Cadastrando produto...";
     }
 
     const nome = document.getElementById("nome")?.value.trim();
@@ -219,7 +279,7 @@ if (formProduto) {
       return;
     }
 
-    // INSERIR
+    // FOTO (opcional na edição — só sobe se o usuário escolher um arquivo novo)
 
     const inputFoto = document.getElementById("foto-produto");
     const arquivoFoto = inputFoto?.files?.[0];
@@ -227,48 +287,32 @@ if (formProduto) {
     let urlFoto = null;
 
     if (arquivoFoto) {
-      // VALIDAÇÃO DA FOTO
-
       const tiposPermitidos = ["image/jpeg", "image/png", "image/webp"];
       const tamanhoMaximo = 5 * 1024 * 1024;
 
       if (!tiposPermitidos.includes(arquivoFoto.type)) {
-        if (msgCadastro) {
+        if (msgCadastro)
           msgCadastro.textContent = "Formato inválido. Use JPG, PNG ou WEBP.";
-        }
         return;
       }
 
       if (arquivoFoto.size > tamanhoMaximo) {
-        if (msgCadastro) {
+        if (msgCadastro)
           msgCadastro.textContent = "A imagem deve ter no máximo 5 MB.";
-        }
         return;
       }
-
-      // NOME ÚNICO DO ARQUIVO
 
       const extensao = arquivoFoto.name.split(".").pop()?.toLowerCase();
 
       if (!extensao) {
-        if (msgCadastro) {
+        if (msgCadastro)
           msgCadastro.textContent =
             "Não foi possível identificar a extensão da imagem.";
-        }
         return;
       }
 
       const nomeArquivo = `${crypto.randomUUID()}.${extensao}`;
-
-      /*
-       * O bucket já é "produtos".
-       * O caminho do objeto será apenas: arquivo.png
-       * e não: produtos/arquivo.png
-       */
-
       const caminhoArquivo = nomeArquivo;
-
-      // UPLOAD COM ATÉ 3 TENTATIVAS
 
       let erroUpload = null;
 
@@ -303,11 +347,8 @@ if (formProduto) {
         }
       }
 
-      // VERIFICAR ERRO DO UPLOAD
-
       if (erroUpload) {
         console.error("Erro definitivo ao enviar foto:", erroUpload);
-
         if (msgCadastro) {
           msgCadastro.textContent =
             "Não foi possível enviar a foto. Verifique sua conexão e o Storage do Supabase.";
@@ -315,54 +356,93 @@ if (formProduto) {
         return;
       }
 
-      // PEGAR URL PÚBLICA
-
       const { data: dadosFoto } = supabaseClient.storage
         .from("produtos")
         .getPublicUrl(caminhoArquivo);
 
       if (!dadosFoto?.publicUrl) {
         console.error("Supabase não retornou a URL pública da imagem.");
-
-        if (msgCadastro) {
+        if (msgCadastro)
           msgCadastro.textContent =
             "A foto foi enviada, mas não foi possível obter a URL.";
-        }
         return;
       }
 
       urlFoto = dadosFoto.publicUrl;
-      console.log("URL da foto:", urlFoto);
     }
 
-    const { data, error } = await supabaseClient
-      .from("produtos")
-      .insert({
-        nome: nome,
-        preco: preco,
-        descricao: descricao || null,
-        estoque: estoque,
-        categoria: categoria,
-        foto: urlFoto,
-        ativo: true,
-      })
-      .select()
-      .single();
+    const dadosProduto = {
+      nome: nome,
+      preco: preco,
+      descricao: descricao || null,
+      estoque: estoque,
+      categoria: categoria,
+      ativo: true,
+    };
+
+    // só inclui "foto" se uma nova foi enviada — senão mantém a atual
+    if (urlFoto) {
+      dadosProduto.foto = urlFoto;
+    }
+
+    let error;
+
+    if (emEdicao) {
+      const resultado = await supabaseClient
+        .from("produtos")
+        .update(dadosProduto)
+        .eq("id", produtoEditandoId);
+
+      error = resultado.error;
+    } else {
+      const resultado = await supabaseClient
+        .from("produtos")
+        .insert(dadosProduto)
+        .select()
+        .single();
+
+      error = resultado.error;
+    }
 
     if (error) {
-      console.error("Erro ao cadastrar produto:", error);
-      msgCadastro.textContent = "Erro ao cadastrar produto.";
+      console.error(
+        emEdicao ? "Erro ao editar produto:" : "Erro ao cadastrar produto:",
+        error,
+      );
+      msgCadastro.textContent = emEdicao
+        ? "Erro ao salvar alterações."
+        : "Erro ao cadastrar produto.";
       return;
     }
 
-    console.log("Produto cadastrado:", data);
+    msgCadastro.textContent = emEdicao
+      ? "Produto atualizado com sucesso!"
+      : "Produto cadastrado com sucesso!";
 
-    msgCadastro.textContent = "Produto cadastrado com sucesso!";
-
+    sairDoModoEdicao();
     formProduto.reset();
 
     await carregarProdutos();
     await atualizarResumo();
+  });
+}
+
+// ==================================================
+// CANCELAR EDIÇÃO
+// ==================================================
+
+function sairDoModoEdicao() {
+  produtoEditandoId = null;
+
+  if (btnSubmitProduto) btnSubmitProduto.textContent = "+ Cadastrar Produto";
+  if (btnCancelarEdicao) btnCancelarEdicao.style.display = "none";
+}
+
+if (btnCancelarEdicao) {
+  btnCancelarEdicao.addEventListener("click", () => {
+    sairDoModoEdicao();
+    formProduto.reset();
+    if (msgCadastro) msgCadastro.textContent = "";
   });
 }
 
@@ -395,10 +475,7 @@ if (buscarAdmin) {
 // 9. REMOVER PRODUTO
 async function removerProduto(id) {
   const confirmar = confirm("Deseja realmente remover este produto?");
-
-  if (!confirmar) {
-    return;
-  }
+  if (!confirmar) return;
 
   const { error } = await supabaseClient.from("produtos").delete().eq("id", id);
 
@@ -408,6 +485,12 @@ async function removerProduto(id) {
     return;
   }
 
+  // se o produto removido era o que estava em edição, sai do modo edição
+  if (produtoEditandoId === id) {
+    sairDoModoEdicao();
+    formProduto.reset();
+  }
+
   alert("Produto removido com sucesso!");
 
   await carregarProdutos();
@@ -415,91 +498,72 @@ async function removerProduto(id) {
 }
 
 // 10. EDITAR PRODUTO
+// ==================================================
+// Antes: prompt() encadeado só pra nome e preço (categoria, estoque,
+// descrição e foto ficavam impossíveis de editar, e cancelar o segundo
+// prompt perdia a edição inteira). Agora: reaproveita o formulário de
+// cadastro, pré-preenchido, e troca pra modo "salvar alterações".
+
 async function editarProduto(id) {
-  const { data: produto, error: erroBusca } = await supabaseClient
+  const { data: produto, error } = await supabaseClient
     .from("produtos")
     .select("*")
     .eq("id", id)
     .single();
 
-  if (erroBusca || !produto) {
-    console.error("Erro ao buscar produto:", erroBusca);
+  if (error || !produto) {
+    console.error("Erro ao buscar produto:", error);
     alert("Não foi possível carregar o produto.");
     return;
   }
 
-  const novoNome = prompt("Nome do produto:", produto.nome || "");
+  produtoEditandoId = produto.id;
 
-  if (novoNome === null || !novoNome.trim()) {
-    return;
+  document.getElementById("nome").value = produto.nome || "";
+  document.getElementById("preco").value = produto.preco ?? "";
+  document.getElementById("descricao").value = produto.descricao || "";
+  document.getElementById("estoque").value = produto.estoque ?? "";
+  document.getElementById("categoria").value = produto.categoria || "";
+  document.getElementById("foto-produto").value = "";
+
+  if (btnSubmitProduto) btnSubmitProduto.textContent = "💾 Salvar Alterações";
+  if (btnCancelarEdicao) btnCancelarEdicao.style.display = "";
+
+  if (msgCadastro) {
+    msgCadastro.textContent =
+      "Editando produto — a foto atual é mantida se você não escolher uma nova.";
   }
 
-  const novoPreco = prompt("Preço:", produto.preco ?? "");
-
-  if (novoPreco === null) {
-    return;
-  }
-
-  const preco = Number(novoPreco.replace(",", "."));
-
-  if (Number.isNaN(preco) || preco < 0) {
-    alert("Preço inválido.");
-    return;
-  }
-
-  const { error } = await supabaseClient
-    .from("produtos")
-    .update({
-      nome: novoNome.trim(),
-      preco: preco,
-      atualizado_em: new Date().toISOString(),
-    })
-    .eq("id", id);
-
-  if (error) {
-    console.error("Erro ao editar produto:", error);
-    alert("Erro ao editar produto.");
-    return;
-  }
-
-  alert("Produto atualizado!");
-
-  await carregarProdutos();
+  document
+    .getElementById("secao-produtos")
+    ?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 // 11. RESUMO DO PAINEL
 
 async function atualizarResumo() {
-  // PRODUTOS
-
   const { count: quantidadeProdutos, error: erroProdutos } =
-    await supabaseClient.from("produtos").select("id", {
-      count: "exact",
-      head: true,
-    });
+    await supabaseClient
+      .from("produtos")
+      .select("id", { count: "exact", head: true });
 
   if (!erroProdutos && totalProdutos) {
     totalProdutos.textContent = quantidadeProdutos || 0;
   }
-
-  // PEDIDOS
 
   const { data: pedidos, error: erroPedidos } = await supabaseClient
     .from("pedidos")
     .select("id, total");
 
   if (!erroPedidos && pedidos) {
-    if (totalPedidos) {
-      totalPedidos.textContent = pedidos.length;
-    }
+    if (totalPedidos) totalPedidos.textContent = pedidos.length;
 
-    const vendas = pedidos.reduce((total, pedido) => {
-      return total + Number(pedido.total || 0);
-    }, 0);
+    const vendas = pedidos.reduce(
+      (total, pedido) => total + Number(pedido.total || 0),
+      0,
+    );
 
-    if (totalVendas) {
-      totalVendas.textContent = formatarMoeda(vendas);
-    }
+    if (totalVendas) totalVendas.textContent = formatarMoeda(vendas);
 
     if (ticketMedio) {
       const ticket = pedidos.length > 0 ? vendas / pedidos.length : 0;
@@ -509,21 +573,24 @@ async function atualizarResumo() {
 }
 
 // 12. CARREGAR PEDIDOS
+// ==================================================
+// Trocado de innerHTML com template string para createElement/textContent.
+// nome_cliente, telefone, endereco, referencia e observacoes vêm de um
+// formulário que QUALQUER CLIENTE preenche no quiosque/delivery, sem
+// sanitização. Com innerHTML, um cliente colocando algo como
+// "<img src=x onerror=...>" no campo Observações executaria esse código
+// no navegador de quem estiver logado no painel admin ao abrir a lista
+// de pedidos. Com textContent isso vira texto puro.
 
 async function carregarPedidos(status = "todos") {
-  if (!listaPedidos) {
-    return;
-  }
+  if (!listaPedidos) return;
 
-  listaPedidos.innerHTML = `
-    <p class="estado-admin">
-      Carregando pedidos...
-    </p>
-  `;
+  listaPedidos.innerHTML = `<p class="estado-admin">Carregando pedidos...</p>`;
 
-  let consulta = supabaseClient.from("pedidos").select("*").order("id", {
-    ascending: false,
-  });
+  let consulta = supabaseClient
+    .from("pedidos")
+    .select("*, itens_pedido(*)")
+    .order("id", { ascending: false });
 
   if (status !== "todos") {
     consulta = consulta.eq("status", status);
@@ -533,23 +600,12 @@ async function carregarPedidos(status = "todos") {
 
   if (error) {
     console.error("Erro ao carregar pedidos:", error);
-
-    listaPedidos.innerHTML = `
-      <p class="estado-admin">
-        Erro ao carregar pedidos.
-      </p>
-    `;
-
+    listaPedidos.innerHTML = `<p class="estado-admin">Erro ao carregar pedidos.</p>`;
     return;
   }
 
   if (!data || data.length === 0) {
-    listaPedidos.innerHTML = `
-      <p class="estado-admin">
-        Nenhum pedido encontrado.
-      </p>
-    `;
-
+    listaPedidos.innerHTML = `<p class="estado-admin">Nenhum pedido encontrado.</p>`;
     return;
   }
 
@@ -559,89 +615,73 @@ async function carregarPedidos(status = "todos") {
     const card = document.createElement("article");
     card.className = "card-pedido";
 
-    card.innerHTML = `
+    const titulo = document.createElement("h3");
+    titulo.textContent = `Pedido #${pedido.id}`;
+    card.appendChild(titulo);
 
-        <h3>
-          Pedido #${pedido.id}
-        </h3>
+    const linhas = [
+      ["Cliente", pedido.nome_cliente],
+      ["WhatsApp", pedido.telefone],
+      ["Tipo", pedido.tipo_pedido],
+    ];
 
-        <p>
-          Cliente:
-          ${pedido.nome_cliente || "-"}
-        </p>
+    if (pedido.mesa) linhas.push(["Mesa", pedido.mesa]);
+    if (pedido.endereco) linhas.push(["Endereço", pedido.endereco]);
+    if (pedido.referencia) linhas.push(["Referência", pedido.referencia]);
 
-        <p>
-          WhatsApp:
-          ${pedido.telefone || "-"}
-        </p>
+    linhas.push(["Forma de pagamento", pedido.forma_pagamento]);
+    linhas.push(["Subtotal", formatarMoeda(pedido.subtotal)]);
+    linhas.push(["Taxa de entrega", formatarMoeda(pedido.taxa_entrega)]);
+    linhas.push(["Total", formatarMoeda(pedido.total)]);
 
-        <p>
-          Tipo:
-          ${pedido.tipo_pedido || "-"}
-        </p>
+    if (pedido.observacoes) linhas.push(["Observações", pedido.observacoes]);
 
-        ${
-          pedido.mesa
-            ? `
-              <p>
-                Mesa:
-                ${pedido.mesa}
-              </p>
-            `
-            : ""
-        }
+    linhas.forEach(([rotulo, valor]) => {
+      const p = document.createElement("p");
+      p.textContent = `${rotulo}: ${valor || "-"}`;
+      card.appendChild(p);
+    });
 
-        ${
-          pedido.endereco
-            ? `
-              <p>
-                Endereço:
-                ${pedido.endereco}
-              </p>
-            `
-            : ""
-        }
+    if (pedido.itens_pedido && pedido.itens_pedido.length > 0) {
+      const tituloItens = document.createElement("p");
+      tituloItens.className = "titulo-itens";
+      tituloItens.textContent = "Itens:";
+      card.appendChild(tituloItens);
 
-        <p>
-          Forma de pagamento:
-          ${pedido.forma_pagamento || "-"}
-        </p>
+      const listaItens = document.createElement("ul");
+      listaItens.className = "itens-pedido";
 
-        <p>
-          Subtotal:
-          ${formatarMoeda(pedido.subtotal)}
-        </p>
+      pedido.itens_pedido.forEach((item) => {
+        const li = document.createElement("li");
+        li.textContent = `${item.quantidade}x ${item.nome_produto} — ${formatarMoeda(item.subtotal)}`;
+        listaItens.appendChild(li);
+      });
 
-        <p>
-          Taxa de entrega:
-          ${formatarMoeda(pedido.taxa_entrega)}
-        </p>
+      card.appendChild(listaItens);
+    }
 
-        <p>
-          Total:
-          ${formatarMoeda(pedido.total)}
-        </p>
+        const status = document.createElement("span");
+    status.className = "status";
+    status.textContent = pedido.status || "pendente";
+    card.appendChild(status);
 
-        ${
-          pedido.observacoes
-            ? `
-              <p>
-                Observações:
-                ${pedido.observacoes}
-              </p>
-            `
-            : ""
-        }
-
-        <span class="status">
-          ${pedido.status || "pendente"}
-        </span>
-
-      `;
+    if (
+      pedido.status !== "pronto" &&
+      pedido.status !== "entregue" &&
+      pedido.status !== "cancelado"
+    ) {
+      const btnConfirmar = document.createElement("button");
+      btnConfirmar.type = "button";
+      btnConfirmar.className = "btn-confirmar-pedido";
+      btnConfirmar.textContent = "✅ Confirmar pedido";
+      btnConfirmar.addEventListener("click", () => confirmarPedido(pedido));
+      card.appendChild(btnConfirmar);
+    }
 
     listaPedidos.appendChild(card);
   });
 }
+
 // 13. FILTRO DE PEDIDOS
 
 if (filtroStatusPedido) {
@@ -651,11 +691,10 @@ if (filtroStatusPedido) {
 }
 
 // 14. CONFIGURAÇÃO DE DELIVERY (tabela "configuracoes")
+// já confirmado que funciona — sem alterações nesta parte.
 
 async function carregarConfigDelivery() {
-  if (!inputTaxa || !inputTempo) {
-    return;
-  }
+  if (!inputTaxa || !inputTempo) return;
 
   const { data, error } = await supabaseClient
     .from("configuracoes")
@@ -670,16 +709,143 @@ async function carregarConfigDelivery() {
   }
 
   if (data) {
-    // já existe uma linha de configuração — guarda o id pra usar no update
     idConfiguracao = data.id;
     inputTaxa.value = data.taxa_entrega;
     inputTempo.value = data.tempo_entrega || "";
   } else {
-    // ainda não existe nenhuma configuração cadastrada
     idConfiguracao = null;
     inputTaxa.value = "";
     inputTempo.value = "";
   }
+}
+
+if (formDelivery) {
+  formDelivery.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const taxa = Number(inputTaxa.value);
+    const tempo = inputTempo.value.trim();
+
+    if (Number.isNaN(taxa) || taxa < 0) {
+      if (msgDelivery) msgDelivery.textContent = "Informe uma taxa válida.";
+      return;
+    }
+
+    if (!tempo) {
+      if (msgDelivery)
+        msgDelivery.textContent = "Informe o tempo estimado de entrega.";
+      return;
+    }
+
+    if (msgDelivery) msgDelivery.textContent = "Salvando...";
+
+    let erro = null;
+
+    if (idConfiguracao) {
+      const resultado = await supabaseClient
+        .from("configuracoes")
+        .update({
+          taxa_entrega: taxa,
+          tempo_entrega: tempo,
+          atualizado_em: new Date().toISOString(),
+        })
+        .eq("id", idConfiguracao);
+
+      erro = resultado.error;
+    } else {
+      const resultado = await supabaseClient
+        .from("configuracoes")
+        .insert({ taxa_entrega: taxa, tempo_entrega: tempo })
+        .select()
+        .single();
+
+      erro = resultado.error;
+
+      if (!erro && resultado.data) {
+        idConfiguracao = resultado.data.id;
+      }
+    }
+
+    if (erro) {
+      console.error("Erro ao salvar configuração de delivery:", erro);
+      if (msgDelivery) msgDelivery.textContent = "Erro ao salvar configuração.";
+      return;
+    }
+
+    if (msgDelivery)
+      msgDelivery.textContent = "Configuração salva com sucesso!";
+  });
+}
+
+// 14.1 CONFIGURAÇÃO DO QUIOSQUE (tabela "mesas")
+// ==================================================
+// Isso não existia antes — o form-quiosque não tinha listener nenhum,
+// então "Salvar configuração" não fazia nada além de recarregar a
+// página. Agora ele gera as mesas 1..N na tabela "mesas" (upsert por
+// "numero") e DESATIVA (não deleta) mesas acima da nova quantidade,
+// pra não perder o histórico de pedidos antigos que referenciam elas.
+
+async function carregarConfigQuiosque() {
+  if (!inputQuantidadeMesas) return;
+
+  const { data, error } = await supabaseClient
+    .from("mesas")
+    .select("numero")
+    .eq("ativa", true)
+    .order("numero", { ascending: false })
+    .limit(1);
+
+  if (error) {
+    console.error("Erro ao carregar configuração do quiosque:", error);
+    return;
+  }
+
+  if (data && data.length > 0) {
+    inputQuantidadeMesas.value = data[0].numero;
+  }
+}
+
+if (formQuiosque) {
+  formQuiosque.addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const quantidade = Number(inputQuantidadeMesas.value);
+
+    if (!Number.isInteger(quantidade) || quantidade < 1) {
+      if (msgQuiosque)
+        msgQuiosque.textContent = "Informe uma quantidade válida de mesas.";
+      return;
+    }
+
+    if (msgQuiosque) msgQuiosque.textContent = "Salvando...";
+
+    const mesas = Array.from({ length: quantidade }, (_, i) => ({
+      numero: i + 1,
+      ativa: true,
+    }));
+
+    const { error: erroUpsert } = await supabaseClient
+      .from("mesas")
+      .upsert(mesas, { onConflict: "numero" });
+
+    if (erroUpsert) {
+      console.error("Erro ao salvar mesas:", erroUpsert);
+      if (msgQuiosque) msgQuiosque.textContent = "Erro ao salvar as mesas.";
+      return;
+    }
+
+    // desativa (sem deletar) qualquer mesa numerada acima da nova quantidade
+    const { error: erroDesativar } = await supabaseClient
+      .from("mesas")
+      .update({ ativa: false })
+      .gt("numero", quantidade);
+
+    if (erroDesativar) {
+      console.error("Erro ao desativar mesas excedentes:", erroDesativar);
+    }
+
+    if (msgQuiosque) msgQuiosque.textContent = "Mesas atualizadas com sucesso!";
+  });
 }
 
 // ==========================================================
@@ -702,14 +868,11 @@ const DIAS_SEMANA = [
   { valor: 6, nome: "Sábado" },
 ];
 
-// ==========================================================
-// CARREGAR HORÁRIOS
-// ==========================================================
-
 async function carregarHorarios() {
   if (!listaHorarios) return;
 
-  listaHorarios.innerHTML = '<p class="estado-admin">Carregando horários...</p>';
+  listaHorarios.innerHTML =
+    '<p class="estado-admin">Carregando horários...</p>';
 
   const { data, error } = await supabaseClient
     .from("horarios")
@@ -718,16 +881,13 @@ async function carregarHorarios() {
 
   if (error) {
     console.error("Erro ao carregar horários:", error);
-    listaHorarios.innerHTML = '<p class="estado-admin">Erro ao carregar horários.</p>';
+    listaHorarios.innerHTML =
+      '<p class="estado-admin">Erro ao carregar horários.</p>';
     return;
   }
 
   renderizarHorarios(data || []);
 }
-
-// ==========================================================
-// RENDERIZAR HORÁRIOS (uma linha por dia da semana)
-// ==========================================================
 
 function renderizarHorarios(horarios) {
   listaHorarios.innerHTML = "";
@@ -768,10 +928,6 @@ function renderizarHorarios(horarios) {
   });
 }
 
-// ==========================================================
-// SALVAR HORÁRIOS (as 7 linhas de uma vez, via upsert)
-// ==========================================================
-
 if (btnSalvarHorarios) {
   btnSalvarHorarios.addEventListener("click", async () => {
     const linhas = listaHorarios.querySelectorAll(".horario-item");
@@ -805,10 +961,6 @@ if (btnSalvarHorarios) {
     if (msgHorarios) msgHorarios.textContent = "Horários salvos com sucesso!";
   });
 }
-
-// ==========================================================
-// MODO DA LOJA (automático / aberta manual / fechada manual)
-// ==========================================================
 
 async function carregarModoLoja() {
   if (!modoLojaSelect) return;
@@ -874,93 +1026,92 @@ if (modoLojaSelect) {
   });
 }
 
-if (formDelivery) {
-  formDelivery.addEventListener("submit", async function (event) {
-    event.preventDefault();
-
-    const taxa = Number(inputTaxa.value);
-    const tempo = inputTempo.value.trim();
-
-    if (Number.isNaN(taxa) || taxa < 0) {
-      if (msgDelivery) {
-        msgDelivery.textContent = "Informe uma taxa válida.";
-      }
-      return;
-    }
-
-    if (!tempo) {
-      if (msgDelivery) {
-        msgDelivery.textContent = "Informe o tempo estimado de entrega.";
-      }
-      return;
-    }
-
-    if (msgDelivery) {
-      msgDelivery.textContent = "Salvando...";
-    }
-
-    let erro = null;
-
-    if (idConfiguracao) {
-      // já existe uma linha — atualiza
-      const resultado = await supabaseClient
-        .from("configuracoes")
-        .update({
-          taxa_entrega: taxa,
-          tempo_entrega: tempo,
-          atualizado_em: new Date().toISOString(),
-        })
-        .eq("id", idConfiguracao);
-
-      erro = resultado.error;
-    } else {
-      // ainda não existe nenhuma linha — cria a primeira
-      const resultado = await supabaseClient
-        .from("configuracoes")
-        .insert({
-          taxa_entrega: taxa,
-          tempo_entrega: tempo,
-        })
-        .select()
-        .single();
-
-      erro = resultado.error;
-
-      if (!erro && resultado.data) {
-        idConfiguracao = resultado.data.id;
-      }
-    }
-
-    if (erro) {
-      console.error("Erro ao salvar configuração de delivery:", erro);
-
-      if (msgDelivery) {
-        msgDelivery.textContent = "Erro ao salvar configuração.";
-      }
-      return;
-    }
-
-    if (msgDelivery) {
-      msgDelivery.textContent = "Configuração salva com sucesso!";
-    }
-  });
-}
-//  15. SAIR
+// 15. SAIR
 function sair() {
   const confirmar = confirm("Deseja sair do painel?");
-
-  if (!confirmar) {
-    return;
-  }
-
+  if (!confirmar) return;
   window.location.href = "../../index.html";
 }
 
 // 16. EXPOR FUNÇÕES
 
-window.removerProduto = removerProduto;
-window.editarProduto = editarProduto;
 window.sair = sair;
+
+// 18. NOTIFICAÇÃO SONORA DE NOVO PEDIDO
+function tocarSomNotificacao() {
+  try {
+    const contexto = new (window.AudioContext || window.webkitAudioContext)();
+    const oscilador = contexto.createOscillator();
+    const ganho = contexto.createGain();
+
+    oscilador.type = "sine";
+    oscilador.frequency.value = 880;
+    ganho.gain.value = 0.3;
+
+    oscilador.connect(ganho);
+    ganho.connect(contexto.destination);
+
+    oscilador.start();
+    oscilador.stop(contexto.currentTime + 0.4);
+  } catch (erro) {
+    console.warn("Não foi possível tocar o som de notificação:", erro);
+  }
+}
+
+supabaseClient
+  .channel("novos-pedidos")
+  .on(
+    "postgres_changes",
+    { event: "INSERT", schema: "public", table: "pedidos" },
+    (payload) => {
+      console.log("Novo pedido recebido:", payload.new);
+      tocarSomNotificacao();
+      carregarPedidos(filtroStatusPedido?.value || "todos");
+      atualizarResumo();
+    },
+  )
+  .subscribe();
+
+  // 19. LIMPEZA DE PEDIDOS PRONTOS APÓS O FECHAMENTO
+async function limparPedidosProntosAntigos() {
+  const agora = new Date();
+  const diaSemana = agora.getDay();
+
+  const { data: horario, error } = await supabaseClient
+    .from("horarios")
+    .select("aberto, fechamento")
+    .eq("dia_semana", diaSemana)
+    .maybeSingle();
+
+  if (error || !horario || !horario.aberto || !horario.fechamento) return;
+
+  const [horaFechamento, minutoFechamento] = horario.fechamento
+    .split(":")
+    .map(Number);
+
+  const fechamentoHoje = new Date(agora);
+  fechamentoHoje.setHours(horaFechamento, minutoFechamento, 0, 0);
+
+  const limiteExclusao = new Date(fechamentoHoje.getTime() + 60 * 60 * 1000);
+
+  if (agora < limiteExclusao) return;
+
+  const { error: erroExclusao } = await supabaseClient
+    .from("pedidos")
+    .delete()
+    .eq("status", "pronto");
+
+  if (erroExclusao) {
+    console.error("Erro ao limpar pedidos prontos antigos:", erroExclusao);
+    return;
+  }
+
+  await carregarPedidos(filtroStatusPedido?.value || "todos");
+  await atualizarResumo();
+}
+
+// verifica a cada 5 minutos
+setInterval(limparPedidosProntosAntigos, 5 * 60 * 1000);
 
 // 17. INICIALIZAÇÃO
 
@@ -974,10 +1125,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
+  await limparPedidosProntosAntigos();
   await carregarProdutos();
   await carregarPedidos();
   await atualizarResumo();
   await carregarConfigDelivery();
+  await carregarConfigQuiosque();
   await carregarHorarios();
   await carregarModoLoja();
 });

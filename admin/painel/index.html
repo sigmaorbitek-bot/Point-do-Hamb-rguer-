@@ -163,7 +163,7 @@
 
             <select id="categoria" name="categoria" required>
               <option value="">Selecione</option>
-              
+
               <option value="lanches">🍔 Lanches</option>
               <option value="bebidas">🥤 Bebidas</option>
               <option value="sobremesas">🍨 Sobremesas</option>
@@ -212,14 +212,25 @@
               accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
             />
 
-            <small class="ajuda-campo"> JPG, PNG ou WEBP • máximo 5 MB </small>
+            <small class="ajuda-campo" id="ajuda-foto">
+              JPG, PNG ou WEBP • máximo 5 MB
+            </small>
           </div>
 
-          <!-- BOTÃO -->
+          <!-- BOTÕES -->
 
-          <div class="campo campo-largo">
+          <div class="campo campo-largo botoes-formulario">
             <button type="submit" class="btn-principal">
               + Cadastrar Produto
+            </button>
+
+            <button
+              type="button"
+              id="btn-cancelar-edicao"
+              class="btn-secundario"
+              style="display: none"
+            >
+              Cancelar edição
             </button>
           </div>
 
@@ -606,7 +617,7 @@
     <!-- ==================================================
          JAVASCRIPT
          ================================================== -->
-     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../../config.js"></script>
     <script src="painel.js"></script>
   </body>
