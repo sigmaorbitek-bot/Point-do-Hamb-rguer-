@@ -421,6 +421,14 @@
 
             <option value="cancelado">Cancelados</option>
           </select>
+
+          <button
+            type="button"
+            id="btn-apagar-prontos"
+            class="btn-apagar-prontos"
+          >
+            🗑️ Apagar pedidos prontos
+          </button>
         </div>
 
         <!-- LISTA -->
@@ -485,9 +493,10 @@
           aria-live="polite"
         ></p>
       </section>
+
       <!-- ==================================================
-     RELATÓRIOS
-     ================================================== -->
+           RELATÓRIOS
+           ================================================== -->
 
       <section id="secao-relatorios" class="admin-section">
         <div class="section-titulo">
@@ -500,7 +509,8 @@
           </div>
         </div>
 
-        <!-- FILTROS -->
+        <!-- FILTRO DE PERÍODO -->
+        <!-- O relatório atualiza sozinho ao trocar o período (ver painel.js) -->
 
         <div class="relatorio-filtros">
           <div class="relatorio-filtro">
@@ -516,10 +526,6 @@
               <option value="mes">Este mês</option>
             </select>
           </div>
-
-          <button type="button" id="btn-gerar-relatorio" class="btn-relatorio">
-            📊 Gerar relatório
-          </button>
         </div>
 
         <!-- RESUMO -->
@@ -613,6 +619,9 @@
         <button type="button" onclick="sair()">🚪 Sair do painel</button>
       </section>
     </main>
+
+
+    <div id="area-impressao" class="area-impressao"></div>
 
     <!-- ==================================================
          JAVASCRIPT

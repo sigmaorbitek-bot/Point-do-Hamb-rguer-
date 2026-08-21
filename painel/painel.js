@@ -1,6 +1,8 @@
 // PAINEL ADMINISTRATIVO - POINT DO HAMBÚRGUER
 
-// 2. ELEMENTOS DO PAINEL
+// ==========================================================
+// 1. ELEMENTOS DO PAINEL
+// ==========================================================
 
 const totalProdutos = document.getElementById("total-produtos");
 const totalPedidos = document.getElementById("total-pedidos");
@@ -16,6 +18,7 @@ const btnCancelarEdicao = document.getElementById("btn-cancelar-edicao");
 
 const listaPedidos = document.getElementById("lista-pedidos");
 const filtroStatusPedido = document.getElementById("filtro-status-pedido");
+const btnApagarProntos = document.getElementById("btn-apagar-prontos");
 
 // ELEMENTOS - CONFIGURAÇÃO DE DELIVERY
 
@@ -30,13 +33,47 @@ const formQuiosque = document.getElementById("form-quiosque");
 const inputQuantidadeMesas = document.getElementById("quantidade-mesas");
 const msgQuiosque = document.getElementById("msg-quiosque");
 
+// ELEMENTOS - FUNCIONAMENTO DA LOJA
+
+const modoLojaSelect = document.getElementById("modo-loja");
+const textoStatusManual = document.getElementById("texto-status-manual");
+const listaHorarios = document.getElementById("lista-horarios");
+const btnSalvarHorarios = document.getElementById("btn-salvar-horarios");
+const msgHorarios = document.getElementById("msg-horarios");
+
+// ELEMENTOS - RELATÓRIOS
+
+const selectRelatorioPeriodo = document.getElementById("relatorio-periodo");
+const btnAtualizarRelatorio = document.getElementById("btn-atualizar-relatorio");
+const btnImprimirRelatorio = document.getElementById("btn-imprimir-relatorio");
+
+const relatorioTotalVendas = document.getElementById("relatorio-total-vendas");
+const relatorioTotalPedidos = document.getElementById("relatorio-total-pedidos");
+const relatorioTicketMedio = document.getElementById("relatorio-ticket-medio");
+const relatorioProdutosVendidos = document.getElementById("relatorio-produtos-vendidos");
+const tabelaRelatorio = document.getElementById("tabela-relatorio");
+
+const areaImpressao = document.getElementById("area-impressao");
+
 // guarda o id da linha de configuração já existente no banco
 let idConfiguracao = null;
 
 // guarda o id do produto em edição (null = formulário está em modo "cadastrar")
 let produtoEditandoId = null;
 
-// 3. FORMATAÇÃO
+const DIAS_SEMANA = [
+  { valor: 0, nome: "Domingo" },
+  { valor: 1, nome: "Segunda-feira" },
+  { valor: 2, nome: "Terça-feira" },
+  { valor: 3, nome: "Quarta-feira" },
+  { valor: 4, nome: "Quinta-feira" },
+  { valor: 5, nome: "Sexta-feira" },
+  { valor: 6, nome: "Sábado" },
+];
+
+// ==========================================================
+// 2. FORMATAÇÃO
+// ==========================================================
 
 function formatarMoeda(valor) {
   return Number(valor || 0).toLocaleString("pt-BR", {
@@ -86,29 +123,10 @@ function montarMensagemConfirmacao(pedido) {
   return `Olá, ${pedido.nome_cliente}! Muito obrigado pela preferência 🙏🏻 Seu pedido #${pedido.id} está a caminho! 🛵`;
 }
 
-// CONFIRMAR PEDIDO: atualiza status e abre o WhatsApp com a mensagem pronta
-async function confirmarPedido(pedido) {
-  const { error } = await supabaseClient
-    .from("pedidos")
-    .update({ status: "pronto" })
-    .eq("id", pedido.id);
+// ==========================================================
+// 3. TESTAR SUPABASE
+// ==========================================================
 
-  if (error) {
-    console.error("Erro ao confirmar pedido:", error);
-    alert("Não foi possível confirmar o pedido.");
-    return;
-  }
-
-  const numero = formatarNumeroWhatsApp(pedido.telefone);
-  const mensagem = montarMensagemConfirmacao(pedido);
-  const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
-
-  window.open(url, "_blank");
-
-  await carregarPedidos(filtroStatusPedido?.value || "todos");
-}
-
-// 4. TESTAR SUPABASE
 async function testarSupabase() {
   const { data, error } = await supabaseClient
     .from("produtos")
@@ -126,7 +144,10 @@ async function testarSupabase() {
   return true;
 }
 
-// 5. CARREGAR PRODUTOS
+// ==========================================================
+// 4. CARREGAR PRODUTOS
+// ==========================================================
+
 async function carregarProdutos() {
   if (!listaAdmin) {
     return;
@@ -156,8 +177,9 @@ async function carregarProdutos() {
   renderizarProdutos(data);
 }
 
-// 6. RENDERIZAR PRODUTOS
-// ==================================================
+// ==========================================================
+// 5. RENDERIZAR PRODUTOS
+// ==========================================================
 // Trocado de innerHTML com template string para createElement/textContent.
 // nome/descricao/categoria vêm do banco, cadastrados pelo próprio painel,
 // então o risco aqui é baixo — mas manter o mesmo padrão em todo o app
@@ -211,6 +233,16 @@ function renderizarProdutos(produtos) {
     btnEditar.textContent = "✏️ Editar";
     btnEditar.addEventListener("click", () => editarProduto(produto.id));
 
+    const btnToggleAtivo = document.createElement("button");
+    btnToggleAtivo.type = "button";
+    btnToggleAtivo.className = produto.ativo
+      ? "btn-desativar-produto"
+      : "btn-ativar-produto";
+    btnToggleAtivo.textContent = produto.ativo ? "🚫 Desativar" : "✅ Ativar";
+    btnToggleAtivo.addEventListener("click", () =>
+      alternarAtivoProduto(produto.id, produto.ativo),
+    );
+
     const btnRemover = document.createElement("button");
     btnRemover.type = "button";
     btnRemover.className = "btn-remover-produto";
@@ -218,6 +250,7 @@ function renderizarProdutos(produtos) {
     btnRemover.addEventListener("click", () => removerProduto(produto.id));
 
     acoes.appendChild(btnEditar);
+    acoes.appendChild(btnToggleAtivo);
     acoes.appendChild(btnRemover);
 
     conteudo.appendChild(nome);
@@ -233,11 +266,33 @@ function renderizarProdutos(produtos) {
   });
 }
 
+// ==========================================================
+// 6. ATIVAR / DESATIVAR PRODUTO
+// ==========================================================
+// Some do cardápio do cliente sem apagar o histórico do produto do banco.
+// Depende da página do cliente filtrar por "ativo = true" na consulta.
+
+async function alternarAtivoProduto(id, ativoAtual) {
+  const { error } = await supabaseClient
+    .from("produtos")
+    .update({ ativo: !ativoAtual })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Erro ao alternar status do produto:", error);
+    alert("Não foi possível alterar o status do produto.");
+    return;
+  }
+
+  await carregarProdutos();
+}
+
+// ==========================================================
 // 7. CADASTRAR / SALVAR EDIÇÃO DE PRODUTO
-// ==================================================
+// ==========================================================
 // O mesmo formulário agora serve pros dois casos. Se produtoEditandoId
 // estiver preenchido, faz UPDATE em vez de INSERT. editarProduto()
-// (item 10) é quem liga esse modo.
+// (seção 9) é quem liga esse modo.
 
 if (formProduto) {
   formProduto.addEventListener("submit", async function (event) {
@@ -427,9 +482,7 @@ if (formProduto) {
   });
 }
 
-// ==================================================
 // CANCELAR EDIÇÃO
-// ==================================================
 
 function sairDoModoEdicao() {
   produtoEditandoId = null;
@@ -446,7 +499,9 @@ if (btnCancelarEdicao) {
   });
 }
 
+// ==========================================================
 // 8. BUSCAR PRODUTOS
+// ==========================================================
 
 if (buscarAdmin) {
   buscarAdmin.addEventListener("input", async function () {
@@ -472,33 +527,9 @@ if (buscarAdmin) {
   });
 }
 
-// 9. REMOVER PRODUTO
-async function removerProduto(id) {
-  const confirmar = confirm("Deseja realmente remover este produto?");
-  if (!confirmar) return;
-
-  const { error } = await supabaseClient.from("produtos").delete().eq("id", id);
-
-  if (error) {
-    console.error("Erro ao remover produto:", error);
-    alert("Não foi possível remover o produto.");
-    return;
-  }
-
-  // se o produto removido era o que estava em edição, sai do modo edição
-  if (produtoEditandoId === id) {
-    sairDoModoEdicao();
-    formProduto.reset();
-  }
-
-  alert("Produto removido com sucesso!");
-
-  await carregarProdutos();
-  await atualizarResumo();
-}
-
-// 10. EDITAR PRODUTO
-// ==================================================
+// ==========================================================
+// 9. EDITAR / REMOVER PRODUTO
+// ==========================================================
 // Antes: prompt() encadeado só pra nome e preço (categoria, estoque,
 // descrição e foto ficavam impossíveis de editar, e cancelar o segundo
 // prompt perdia a edição inteira). Agora: reaproveita o formulário de
@@ -539,7 +570,33 @@ async function editarProduto(id) {
     ?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-// 11. RESUMO DO PAINEL
+async function removerProduto(id) {
+  const confirmar = confirm("Deseja realmente remover este produto?");
+  if (!confirmar) return;
+
+  const { error } = await supabaseClient.from("produtos").delete().eq("id", id);
+
+  if (error) {
+    console.error("Erro ao remover produto:", error);
+    alert("Não foi possível remover o produto.");
+    return;
+  }
+
+  // se o produto removido era o que estava em edição, sai do modo edição
+  if (produtoEditandoId === id) {
+    sairDoModoEdicao();
+    formProduto.reset();
+  }
+
+  alert("Produto removido com sucesso!");
+
+  await carregarProdutos();
+  await atualizarResumo();
+}
+
+// ==========================================================
+// 10. RESUMO DO PAINEL
+// ==========================================================
 
 async function atualizarResumo() {
   const { count: quantidadeProdutos, error: erroProdutos } =
@@ -572,8 +629,76 @@ async function atualizarResumo() {
   }
 }
 
+// ==========================================================
+// 11. CONFIRMAR PEDIDO (status + baixa de estoque + WhatsApp)
+// ==========================================================
+
+// DÁ BAIXA NO ESTOQUE DE CADA ITEM DO PEDIDO CONFIRMADO
+async function darBaixaEstoque(pedido) {
+  if (!pedido.itens_pedido || pedido.itens_pedido.length === 0) return;
+
+  for (const item of pedido.itens_pedido) {
+    if (!item.produto_id) continue; // produto pode ter sido removido do cardápio depois
+
+    const { data: produto, error: erroBusca } = await supabaseClient
+      .from("produtos")
+      .select("estoque")
+      .eq("id", item.produto_id)
+      .single();
+
+    if (erroBusca || !produto) {
+      console.warn(
+        `Produto ${item.produto_id} não encontrado para dar baixa no estoque.`,
+      );
+      continue;
+    }
+
+    const novoEstoque = Math.max(0, (produto.estoque || 0) - item.quantidade);
+
+    const { error: erroAtualizar } = await supabaseClient
+      .from("produtos")
+      .update({ estoque: novoEstoque })
+      .eq("id", item.produto_id);
+
+    if (erroAtualizar) {
+      console.error(
+        `Erro ao atualizar estoque do produto ${item.produto_id}:`,
+        erroAtualizar,
+      );
+    }
+  }
+}
+
+// CONFIRMAR PEDIDO: atualiza status, dá baixa no estoque e abre o WhatsApp
+// já com a mensagem pronta (o funcionário só confere e envia).
+async function confirmarPedido(pedido) {
+  const { error } = await supabaseClient
+    .from("pedidos")
+    .update({ status: "pronto" })
+    .eq("id", pedido.id);
+
+  if (error) {
+    console.error("Erro ao confirmar pedido:", error);
+    alert("Não foi possível confirmar o pedido.");
+    return;
+  }
+
+  await darBaixaEstoque(pedido);
+
+  const numero = formatarNumeroWhatsApp(pedido.telefone);
+  const mensagem = montarMensagemConfirmacao(pedido);
+  const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
+
+  window.open(url, "_blank");
+
+  await carregarPedidos(filtroStatusPedido?.value || "todos");
+  await carregarProdutos();
+  await atualizarResumo();
+}
+
+// ==========================================================
 // 12. CARREGAR PEDIDOS
-// ==================================================
+// ==========================================================
 // Trocado de innerHTML com template string para createElement/textContent.
 // nome_cliente, telefone, endereco, referencia e observacoes vêm de um
 // formulário que QUALQUER CLIENTE preenche no quiosque/delivery, sem
@@ -621,17 +746,22 @@ async function carregarPedidos(status = "todos") {
 
     const linhas = [
       ["Cliente", pedido.nome_cliente],
-      ["WhatsApp", pedido.telefone],
+      ["WhatsApp", formatarTelefoneExibicao(pedido.telefone)],
       ["Tipo", pedido.tipo_pedido],
     ];
 
-    if (pedido.mesa) linhas.push(["Mesa", pedido.mesa]);
+    if (pedido.mesa) linhas.push(["Mesa", formatarMesa(pedido.mesa)]);
     if (pedido.endereco) linhas.push(["Endereço", pedido.endereco]);
     if (pedido.referencia) linhas.push(["Referência", pedido.referencia]);
 
     linhas.push(["Forma de pagamento", pedido.forma_pagamento]);
     linhas.push(["Subtotal", formatarMoeda(pedido.subtotal)]);
-    linhas.push(["Taxa de entrega", formatarMoeda(pedido.taxa_entrega)]);
+
+    // Taxa de entrega só faz sentido pra pedidos de delivery
+    if (pedido.tipo_pedido === "delivery") {
+      linhas.push(["Taxa de entrega", formatarMoeda(pedido.taxa_entrega)]);
+    }
+
     linhas.push(["Total", formatarMoeda(pedido.total)]);
 
     if (pedido.observacoes) linhas.push(["Observações", pedido.observacoes]);
@@ -642,6 +772,7 @@ async function carregarPedidos(status = "todos") {
       card.appendChild(p);
     });
 
+    // Itens do pedido — só mostra o bloco se houver pelo menos 1 item
     if (pedido.itens_pedido && pedido.itens_pedido.length > 0) {
       const tituloItens = document.createElement("p");
       tituloItens.className = "titulo-itens";
@@ -660,11 +791,12 @@ async function carregarPedidos(status = "todos") {
       card.appendChild(listaItens);
     }
 
-        const status = document.createElement("span");
+    const status = document.createElement("span");
     status.className = "status";
     status.textContent = pedido.status || "pendente";
     card.appendChild(status);
 
+    // Botão "Confirmar pedido" — só aparece se ainda não foi confirmado
     if (
       pedido.status !== "pronto" &&
       pedido.status !== "entregue" &&
@@ -682,7 +814,9 @@ async function carregarPedidos(status = "todos") {
   });
 }
 
-// 13. FILTRO DE PEDIDOS
+// ==========================================================
+// 13. FILTRO E LIMPEZA MANUAL DE PEDIDOS
+// ==========================================================
 
 if (filtroStatusPedido) {
   filtroStatusPedido.addEventListener("change", function () {
@@ -690,8 +824,36 @@ if (filtroStatusPedido) {
   });
 }
 
+// APAGAR PEDIDOS PRONTOS MANUALMENTE
+// Requer que a foreign key de itens_pedido tenha ON DELETE CASCADE
+// (ver instrução do ALTER TABLE combinada anteriormente).
+if (btnApagarProntos) {
+  btnApagarProntos.addEventListener("click", async () => {
+    const confirmar = confirm(
+      "Deseja apagar todos os pedidos com status 'pronto'?",
+    );
+    if (!confirmar) return;
+
+    const { error } = await supabaseClient
+      .from("pedidos")
+      .delete()
+      .eq("status", "pronto");
+
+    if (error) {
+      console.error("Erro ao apagar pedidos prontos:", error);
+      alert("Não foi possível apagar os pedidos prontos.");
+      return;
+    }
+
+    alert("Pedidos prontos apagados com sucesso!");
+    await carregarPedidos(filtroStatusPedido?.value || "todos");
+    await atualizarResumo();
+  });
+}
+
+// ==========================================================
 // 14. CONFIGURAÇÃO DE DELIVERY (tabela "configuracoes")
-// já confirmado que funciona — sem alterações nesta parte.
+// ==========================================================
 
 async function carregarConfigDelivery() {
   if (!inputTaxa || !inputTempo) return;
@@ -777,13 +939,12 @@ if (formDelivery) {
   });
 }
 
-// 14.1 CONFIGURAÇÃO DO QUIOSQUE (tabela "mesas")
-// ==================================================
-// Isso não existia antes — o form-quiosque não tinha listener nenhum,
-// então "Salvar configuração" não fazia nada além de recarregar a
-// página. Agora ele gera as mesas 1..N na tabela "mesas" (upsert por
-// "numero") e DESATIVA (não deleta) mesas acima da nova quantidade,
-// pra não perder o histórico de pedidos antigos que referenciam elas.
+// ==========================================================
+// 15. CONFIGURAÇÃO DO QUIOSQUE (tabela "mesas")
+// ==========================================================
+// Gera as mesas 1..N na tabela "mesas" (upsert por "numero") e DESATIVA
+// (não deleta) mesas acima da nova quantidade, pra não perder o
+// histórico de pedidos antigos que referenciam elas.
 
 async function carregarConfigQuiosque() {
   if (!inputQuantidadeMesas) return;
@@ -849,24 +1010,8 @@ if (formQuiosque) {
 }
 
 // ==========================================================
-// ELEMENTOS - FUNCIONAMENTO DA LOJA
+// 16. FUNCIONAMENTO DA LOJA (horários + modo manual)
 // ==========================================================
-
-const modoLojaSelect = document.getElementById("modo-loja");
-const textoStatusManual = document.getElementById("texto-status-manual");
-const listaHorarios = document.getElementById("lista-horarios");
-const btnSalvarHorarios = document.getElementById("btn-salvar-horarios");
-const msgHorarios = document.getElementById("msg-horarios");
-
-const DIAS_SEMANA = [
-  { valor: 0, nome: "Domingo" },
-  { valor: 1, nome: "Segunda-feira" },
-  { valor: 2, nome: "Terça-feira" },
-  { valor: 3, nome: "Quarta-feira" },
-  { valor: 4, nome: "Quinta-feira" },
-  { valor: 5, nome: "Sexta-feira" },
-  { valor: 6, nome: "Sábado" },
-];
 
 async function carregarHorarios() {
   if (!listaHorarios) return;
@@ -1026,18 +1171,211 @@ if (modoLojaSelect) {
   });
 }
 
-// 15. SAIR
-function sair() {
-  const confirmar = confirm("Deseja sair do painel?");
-  if (!confirmar) return;
-  window.location.href = "../../index.html";
+// ==========================================================
+// 17. RELATÓRIOS
+// ==========================================================
+
+function calcularIntervaloRelatorio(periodo) {
+  const agora = new Date();
+  const fim = new Date(agora);
+  fim.setHours(23, 59, 59, 999);
+
+  const inicio = new Date(agora);
+  inicio.setHours(0, 0, 0, 0);
+
+  if (periodo === "7dias") {
+    inicio.setDate(inicio.getDate() - 6);
+  } else if (periodo === "30dias") {
+    inicio.setDate(inicio.getDate() - 29);
+  } else if (periodo === "mes") {
+    inicio.setDate(1);
+  }
+
+  return { inicio, fim };
 }
 
-// 16. EXPOR FUNÇÕES
+async function gerarRelatorio() {
+  if (!selectRelatorioPeriodo) return;
 
-window.sair = sair;
+  const periodo = selectRelatorioPeriodo.value;
+  const { inicio, fim } = calcularIntervaloRelatorio(periodo);
 
-// 18. NOTIFICAÇÃO SONORA DE NOVO PEDIDO
+  const { data: pedidos, error } = await supabaseClient
+    .from("pedidos")
+    .select("id, total, criado_em, itens_pedido(quantidade)")
+    .gte("criado_em", inicio.toISOString())
+    .lte("criado_em", fim.toISOString())
+    .order("criado_em", { ascending: true });
+
+  if (error) {
+    console.error("Erro ao gerar relatório:", error);
+    if (tabelaRelatorio) {
+      tabelaRelatorio.innerHTML = `<tr><td colspan="5">Erro ao carregar relatório.</td></tr>`;
+    }
+    return;
+  }
+
+  const lista = pedidos || [];
+
+  const totalVendasPeriodo = lista.reduce(
+    (soma, p) => soma + Number(p.total || 0),
+    0,
+  );
+  const totalPedidosCount = lista.length;
+  const ticket = totalPedidosCount > 0 ? totalVendasPeriodo / totalPedidosCount : 0;
+
+  const totalProdutosVendidos = lista.reduce((soma, p) => {
+    const itens = p.itens_pedido || [];
+    return (
+      soma + itens.reduce((s, item) => s + Number(item.quantidade || 0), 0)
+    );
+  }, 0);
+
+  if (relatorioTotalVendas)
+    relatorioTotalVendas.textContent = formatarMoeda(totalVendasPeriodo);
+  if (relatorioTotalPedidos)
+    relatorioTotalPedidos.textContent = totalPedidosCount;
+  if (relatorioTicketMedio)
+    relatorioTicketMedio.textContent = formatarMoeda(ticket);
+  if (relatorioProdutosVendidos)
+    relatorioProdutosVendidos.textContent = totalProdutosVendidos;
+
+  renderizarTabelaRelatorio(lista);
+}
+
+function renderizarTabelaRelatorio(pedidos) {
+  if (!tabelaRelatorio) return;
+
+  if (pedidos.length === 0) {
+    tabelaRelatorio.innerHTML = `<tr><td colspan="5">Nenhum pedido no período.</td></tr>`;
+    return;
+  }
+
+  const porDia = {};
+
+  pedidos.forEach((pedido) => {
+    const data = new Date(pedido.criado_em);
+    const chave = data.toLocaleDateString("pt-BR");
+
+    if (!porDia[chave]) {
+      porDia[chave] = { pedidos: 0, produtos: 0, vendas: 0 };
+    }
+
+    porDia[chave].pedidos += 1;
+    porDia[chave].vendas += Number(pedido.total || 0);
+
+    const itens = pedido.itens_pedido || [];
+    porDia[chave].produtos += itens.reduce(
+      (s, item) => s + Number(item.quantidade || 0),
+      0,
+    );
+  });
+
+  tabelaRelatorio.innerHTML = "";
+
+  Object.keys(porDia).forEach((dia) => {
+    const linha = porDia[dia];
+    const ticketDia = linha.pedidos > 0 ? linha.vendas / linha.pedidos : 0;
+
+    const tr = document.createElement("tr");
+
+    const tdData = document.createElement("td");
+    tdData.textContent = dia;
+
+    const tdPedidos = document.createElement("td");
+    tdPedidos.textContent = linha.pedidos;
+
+    const tdProdutos = document.createElement("td");
+    tdProdutos.textContent = linha.produtos;
+
+    const tdVendas = document.createElement("td");
+    tdVendas.className = "valor";
+    tdVendas.textContent = formatarMoeda(linha.vendas);
+
+    const tdTicket = document.createElement("td");
+    tdTicket.textContent = formatarMoeda(ticketDia);
+
+    tr.appendChild(tdData);
+    tr.appendChild(tdPedidos);
+    tr.appendChild(tdProdutos);
+    tr.appendChild(tdVendas);
+    tr.appendChild(tdTicket);
+
+    tabelaRelatorio.appendChild(tr);
+  });
+}
+
+// O relatório atualiza sozinho ao trocar o período — não existe mais
+// botão "Gerar relatório" separado.
+if (selectRelatorioPeriodo) {
+  selectRelatorioPeriodo.addEventListener("change", gerarRelatorio);
+}
+
+if (btnAtualizarRelatorio) {
+  btnAtualizarRelatorio.addEventListener("click", gerarRelatorio);
+}
+
+// ==========================================================
+// 18. IMPRESSÃO DO RELATÓRIO
+// ==========================================================
+// Ao imprimir, só a folha com os 4 números do período aparece — o
+// resto da página fica escondido (ver @media print no style.css).
+
+function rotuloPeriodoRelatorio(periodo) {
+  const rotulos = {
+    hoje: "Hoje",
+    "7dias": "Últimos 7 dias",
+    "30dias": "Últimos 30 dias",
+    mes: "Este mês",
+  };
+  return rotulos[periodo] || "Período selecionado";
+}
+
+if (btnImprimirRelatorio) {
+  btnImprimirRelatorio.addEventListener("click", () => {
+    if (!areaImpressao) {
+      window.print();
+      return;
+    }
+
+    const periodo = selectRelatorioPeriodo?.value || "hoje";
+    const dataGeracao = new Date().toLocaleDateString("pt-BR");
+
+    areaImpressao.innerHTML = "";
+
+    const titulo = document.createElement("h2");
+    titulo.textContent = "Point 🍔 Hambúrguer — Relatório de Vendas";
+    areaImpressao.appendChild(titulo);
+
+    const subtitulo = document.createElement("p");
+    subtitulo.className = "subtitulo-impressao";
+    subtitulo.textContent = `Período: ${rotuloPeriodoRelatorio(periodo)} — Gerado em ${dataGeracao}`;
+    areaImpressao.appendChild(subtitulo);
+
+    const itens = [
+      ["💰 Total vendido", relatorioTotalVendas?.textContent],
+      ["🛒 Pedidos", relatorioTotalPedidos?.textContent],
+      ["🍔 Produtos vendidos", relatorioProdutosVendidos?.textContent],
+      ["📈 Ticket médio", relatorioTicketMedio?.textContent],
+    ];
+
+    itens.forEach(([rotulo, valor]) => {
+      const p = document.createElement("p");
+      p.className = "linha-impressao";
+      p.textContent = `${rotulo}: ${(valor || "-").trim()}`;
+      areaImpressao.appendChild(p);
+    });
+
+    window.print();
+  });
+}
+
+// ==========================================================
+// 19. NOTIFICAÇÃO SONORA DE NOVO PEDIDO
+// ==========================================================
+// Depende do painel estar aberto no navegador — não funciona em
+// segundo plano com o navegador fechado.
+
 function tocarSomNotificacao() {
   try {
     const contexto = new (window.AudioContext || window.webkitAudioContext)();
@@ -1072,7 +1410,13 @@ supabaseClient
   )
   .subscribe();
 
-  // 19. LIMPEZA DE PEDIDOS PRONTOS APÓS O FECHAMENTO
+// ==========================================================
+// 20. LIMPEZA AUTOMÁTICA DE PEDIDOS PRONTOS
+// ==========================================================
+// 1 hora após o horário de fechamento do dia, apaga os pedidos com
+// status "pronto". Só roda enquanto o painel estiver aberto no
+// navegador — verifica a cada 5 minutos.
+
 async function limparPedidosProntosAntigos() {
   const agora = new Date();
   const diaSemana = agora.getDay();
@@ -1110,10 +1454,23 @@ async function limparPedidosProntosAntigos() {
   await atualizarResumo();
 }
 
-// verifica a cada 5 minutos
 setInterval(limparPedidosProntosAntigos, 5 * 60 * 1000);
 
-// 17. INICIALIZAÇÃO
+// ==========================================================
+// 21. SAIR
+// ==========================================================
+
+function sair() {
+  const confirmar = confirm("Deseja sair do painel?");
+  if (!confirmar) return;
+  window.location.href = "../../index.html";
+}
+
+window.sair = sair;
+
+// ==========================================================
+// 22. INICIALIZAÇÃO
+// ==========================================================
 
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("Painel administrativo iniciado.");
@@ -1133,4 +1490,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   await carregarConfigQuiosque();
   await carregarHorarios();
   await carregarModoLoja();
+  await gerarRelatorio();
 });
