@@ -353,6 +353,21 @@ body {
     transform 0.25s ease;
 }
 
+.mensagem-login {
+  min-height: 20px;
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: var(--cor-texto-secundario);
+}
+
+.mensagem-login.erro {
+  color: #ff6b6b;
+}
+
+.mensagem-login.sucesso {
+  color: var(--cor-sucesso);
+}
+
 /* ==========================================================================
    HOVER — VOLTAR
    ========================================================================== */

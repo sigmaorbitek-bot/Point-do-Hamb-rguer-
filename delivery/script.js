@@ -4,7 +4,7 @@
 
 // Valor de segurança usado ENQUANTO a taxa real não chega do Supabase.
 // Assim que carregarConfiguracoes() responder, esse valor é substituído.
-let TAXA_ENTREGA = 2.0;
+let TAXA_ENTREGA = 0;
 
 // ==================================================
 // ELEMENTOS DA PÁGINA
@@ -105,7 +105,8 @@ carrinhoFechar.addEventListener("click", () => {
 
 async function carregarProdutos() {
   try {
-    listaItens.innerHTML = '<p class="estado-cardapio">Carregando cardápio...</p>';
+    listaItens.innerHTML =
+      '<p class="estado-cardapio">Carregando cardápio...</p>';
 
     const { data, error } = await supabaseClient
       .from("produtos")
@@ -123,7 +124,8 @@ async function carregarProdutos() {
     produtos = data || [];
 
     if (produtos.length === 0) {
-      listaItens.innerHTML = '<p class="estado-cardapio">Nenhum produto disponível.</p>';
+      listaItens.innerHTML =
+        '<p class="estado-cardapio">Nenhum produto disponível.</p>';
       return;
     }
 
@@ -149,7 +151,8 @@ function renderizarProdutos(listaProdutos) {
   listaItens.innerHTML = "";
 
   if (listaProdutos.length === 0) {
-    listaItens.innerHTML = '<p class="estado-cardapio">Nenhum produto encontrado.</p>';
+    listaItens.innerHTML =
+      '<p class="estado-cardapio">Nenhum produto encontrado.</p>';
     return;
   }
 
@@ -174,7 +177,8 @@ function renderizarProdutos(listaProdutos) {
     nome.textContent = produto.nome || "Produto";
 
     const descricao = document.createElement("p");
-    descricao.textContent = produto.descricao || "Produto selecionado pelo Point do Hambúrguer.";
+    descricao.textContent =
+      produto.descricao || "Produto selecionado pelo Point do Hambúrguer.";
 
     const preco = document.createElement("span");
     preco.className = "preco";
@@ -219,7 +223,9 @@ function renderizarProdutos(listaProdutos) {
 }
 
 function normalizarCategoria(categoria) {
-  return String(categoria || "").trim().toLowerCase();
+  return String(categoria || "")
+    .trim()
+    .toLowerCase();
 }
 
 // ==================================================
@@ -242,11 +248,13 @@ function aplicarFiltros() {
 
   const produtosFiltrados = produtos.filter((produto) => {
     const categoriaProduto = normalizarCategoria(produto.categoria);
-    const passaCategoria = categoriaAtual === "todos" || categoriaProduto === categoriaAtual;
+    const passaCategoria =
+      categoriaAtual === "todos" || categoriaProduto === categoriaAtual;
 
     const nomeProduto = String(produto.nome || "").toLowerCase();
     const descricaoProduto = String(produto.descricao || "").toLowerCase();
-    const passaBusca = nomeProduto.includes(termo) || descricaoProduto.includes(termo);
+    const passaBusca =
+      nomeProduto.includes(termo) || descricaoProduto.includes(termo);
 
     return passaCategoria && passaBusca;
   });
@@ -308,7 +316,10 @@ function aumentarQuantidade(produtoId) {
 }
 
 function calcularTotais() {
-  const subtotal = carrinho.reduce((soma, item) => soma + item.preco * item.quantidade, 0);
+  const subtotal = carrinho.reduce(
+    (soma, item) => soma + item.preco * item.quantidade,
+    0,
+  );
   const taxa = carrinho.length > 0 ? TAXA_ENTREGA : 0;
   const total = subtotal + taxa;
   return { subtotal, taxa, total };
@@ -328,7 +339,8 @@ function renderizarCarrinho() {
   carrinhoContador.textContent = quantidade;
 
   if (carrinho.length === 0) {
-    carrinhoItens.innerHTML = '<p class="carrinho-vazio">Seu carrinho está vazio</p>';
+    carrinhoItens.innerHTML =
+      '<p class="carrinho-vazio">Seu carrinho está vazio</p>';
     btnFinalizar.disabled = true;
     return;
   }
@@ -525,8 +537,14 @@ formPedido.addEventListener("submit", async (evento) => {
 // INICIALIZAÇÃO
 // ==================================================
 
-document.addEventListener("DOMContentLoaded", () => {
-  carregarConfiguracoes();
-  carregarProdutos();
+document.addEventListener("DOMContentLoaded", async () => {
+  const telaCarregamento = document.getElementById("tela-carregamento");
+
+  await Promise.all([carregarConfiguracoes(), carregarProdutos()]);
+
   renderizarCarrinho();
+
+  if (telaCarregamento) {
+    telaCarregamento.classList.add("escondida");
+  }
 });

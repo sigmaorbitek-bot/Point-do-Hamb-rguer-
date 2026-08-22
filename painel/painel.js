@@ -1460,9 +1460,10 @@ setInterval(limparPedidosProntosAntigos, 5 * 60 * 1000);
 // 21. SAIR
 // ==========================================================
 
-function sair() {
+async function sair() {
   const confirmar = confirm("Deseja sair do painel?");
   if (!confirmar) return;
+  await supabaseClient.auth.signOut();
   window.location.href = "../../index.html";
 }
 
@@ -1475,10 +1476,16 @@ window.sair = sair;
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("Painel administrativo iniciado.");
 
+  const telaCarregamento = document.getElementById("tela-carregamento");
+
   const conectado = await testarSupabase();
 
   if (!conectado) {
     console.error("Painel não conseguiu conectar ao Supabase.");
+    if (telaCarregamento) {
+      telaCarregamento.querySelector("p").textContent =
+        "Erro ao conectar. Recarregue a página.";
+    }
     return;
   }
 
@@ -1491,4 +1498,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   await carregarHorarios();
   await carregarModoLoja();
   await gerarRelatorio();
+
+  if (telaCarregamento) {
+    telaCarregamento.classList.add("escondida");
+  }
 });

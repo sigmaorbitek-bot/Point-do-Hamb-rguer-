@@ -949,10 +949,14 @@ function mostrarErroProdutos(mensagem) {
 // INICIALIZAÇÃO
 // ==================================================
 
-document.addEventListener("DOMContentLoaded", () => {
-  carregarProdutos();
+document.addEventListener("DOMContentLoaded", async () => {
+  const telaCarregamento = document.getElementById("tela-carregamento");
 
-  carregarMesas();
+  await Promise.all([carregarProdutos(), carregarMesas()]);
 
   renderizarCarrinho();
+
+  if (telaCarregamento) {
+    telaCarregamento.classList.add("escondida");
+  }
 });
